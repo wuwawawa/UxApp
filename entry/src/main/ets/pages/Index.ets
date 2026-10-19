@@ -14,6 +14,7 @@
  */
 
 import { FilterDialogTruncationPage } from './truncation/FilterDialogTruncation';
+import { HemaTaskSheetTruncationPage } from './truncation/HemaTaskSheetTruncation';
 import { VipRenewalSheetTruncationPage } from './truncation/VipRenewalSheetTruncation';
 
 /**
@@ -55,6 +56,12 @@ const CASE_CATALOG: CaseCategory[] = [
         caseTitle: '会员续费弹层截断',
         caseSummary: '',
         caseTag: 'Pura X Max'
+      },
+      {
+        caseRoute: 'truncation/hema-task-sheet',
+        caseTitle: '盒马签到弹层截断',
+        caseSummary: '',
+        caseTag: 'Pura X Max'
       }
     ]
   }
@@ -71,6 +78,8 @@ struct Index {
       FilterDialogTruncationPage({ pageStack: this.navStack })
     } else if (routeName === 'truncation/vip-renewal-sheet') {
       VipRenewalSheetTruncationPage({ pageStack: this.navStack })
+    } else if (routeName === 'truncation/hema-task-sheet') {
+      HemaTaskSheetTruncationPage({ pageStack: this.navStack })
     }
   }
 
