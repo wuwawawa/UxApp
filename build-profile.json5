@@ -1,0 +1,56 @@
+{
+  app: {
+    signingConfigs: [
+      {
+        name: 'default',
+        type: 'HarmonyOS',
+        material: {
+          certpath: 'C:\\Users\\fortune\\.ohos\\config\\default_HelloWorld_u0DI3GkAsA8iOgPcWoBISfRYAPvLExioqrUaE7Ucdoo=.cer',
+          keyAlias: 'debugKey',
+          keyPassword: '0000001b44b82cd19b93474540e40beb58f0e7c0ec77786cbb22d361c746de5df8fca1f9d92dcfafbd193e',
+          profile: 'C:\\Users\\fortune\\.ohos\\config\\default_HelloWorld_u0DI3GkAsA8iOgPcWoBISfRYAPvLExioqrUaE7Ucdoo=.p7b',
+          signAlg: 'SHA256withECDSA',
+          storeFile: 'C:\\Users\\fortune\\.ohos\\config\\default_HelloWorld_u0DI3GkAsA8iOgPcWoBISfRYAPvLExioqrUaE7Ucdoo=.p12',
+          storePassword: '0000001b44b82cd19b93474540e40beb58f0e7c0ec77786cbb22d361c746de5df8fca1f9d92dcfafbd193e',
+        },
+      },
+    ],
+    products: [
+      {
+        name: 'default',
+        signingConfig: 'default',
+        targetSdkVersion: '6.1.0(23)',
+        compatibleSdkVersion: '6.1.0(23)',
+        runtimeOS: 'HarmonyOS',
+        buildOption: {
+          strictMode: {
+            caseSensitiveCheck: true,
+            useNormalizedOHMUrl: true,
+          },
+        },
+      },
+    ],
+    buildModeSet: [
+      {
+        name: 'debug',
+      },
+      {
+        name: 'release',
+      },
+    ],
+  },
+  modules: [
+    {
+      name: 'entry',
+      srcPath: './entry',
+      targets: [
+        {
+          name: 'default',
+          applyToProducts: [
+            'default',
+          ],
+        },
+      ],
+    },
+  ],
+}
