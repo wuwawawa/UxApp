@@ -30,6 +30,7 @@
 
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { WindowModeController } from '../../common/WindowModeController';
 
 /** 缩放基准：单屏态窗口宽度（1264px / 2.75） */
 const HEMA_REFERENCE_WIDTH: number = 459.6;
@@ -54,52 +55,35 @@ export struct HemaTaskSheetTruncationPage {
   /** 签到提醒开关状态，仅用于让弹层可交互 */
   @State reminderOn: boolean = false;
 
-  private hostWindow: window.Window | undefined = undefined;
+  private pageActive: boolean = false;
+  private windowToken: number = 0;
 
   aboutToAppear(): void {
-    this.enableFullScreen();
+    this.pageActive = true;
+    this.enterImmersiveMode();
   }
 
   aboutToDisappear(): void {
-    this.restoreWindowMode();
+    this.pageActive = false;
+    if (this.windowToken > 0) {
+      WindowModeController.release(this.windowToken);
+      this.windowToken = 0;
+    }
   }
 
-  private enableFullScreen(): void {
+  private enterImmersiveMode(): void {
     const hostContext = this.getUIContext().getHostContext();
     if (hostContext === undefined) {
       return;
     }
     window.getLastWindow(hostContext).then((win: window.Window) => {
-      this.hostWindow = win;
-      win.setWindowLayoutFullScreen(true).catch((error: BusinessError) => {
-        console.error(`setWindowLayoutFullScreen failed, code=${error.code}`);
-      });
-      win.setWindowSystemBarProperties({
-        statusBarContentColor: '#000000',
-        navigationBarContentColor: '#000000'
-      }).catch((error: BusinessError) => {
-        console.error(`setWindowSystemBarProperties failed, code=${error.code}`);
-      });
+      if (!this.pageActive) {
+        return;
+      }
+      this.windowToken = WindowModeController.acquire(win, '#000000');
     }).catch((error: BusinessError) => {
       console.error(`getLastWindow failed, code=${error.code}`);
     });
-  }
-
-  private restoreWindowMode(): void {
-    const win: window.Window | undefined = this.hostWindow;
-    if (win === undefined) {
-      return;
-    }
-    win.setWindowLayoutFullScreen(false).catch((error: BusinessError) => {
-      console.error(`setWindowLayoutFullScreen failed, code=${error.code}`);
-    });
-    win.setWindowSystemBarProperties({
-      statusBarContentColor: '#000000',
-      navigationBarContentColor: '#000000'
-    }).catch((error: BusinessError) => {
-      console.error(`setWindowSystemBarProperties failed, code=${error.code}`);
-    });
-    this.hostWindow = undefined;
   }
 
   /** 整页等比缩放比：窗口宽度 / 单屏态宽度 */

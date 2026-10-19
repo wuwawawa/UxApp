@@ -28,6 +28,7 @@
 
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { WindowModeController } from '../../common/WindowModeController';
 
 /** 缩放基准宽度：弹层设计尺寸按 361vp 宽绘制，实际窗口宽度 / 361 即为缩放比 */
 const VIP_RENEWAL_REFERENCE_WIDTH: number = 361;
@@ -47,57 +48,40 @@ export struct VipRenewalSheetTruncationPage {
   @State winWidthVp: number = VIP_RENEWAL_REFERENCE_WIDTH;
   @State statusBarHeightVp: number = 34;
 
-  private hostWindow: window.Window | undefined = undefined;
+  private pageActive: boolean = false;
+  private windowToken: number = 0;
 
   aboutToAppear(): void {
-    this.enableFullScreen();
+    this.pageActive = true;
+    this.enterImmersiveMode();
   }
 
   aboutToDisappear(): void {
-    this.restoreWindowMode();
+    this.pageActive = false;
+    if (this.windowToken > 0) {
+      WindowModeController.release(this.windowToken);
+      this.windowToken = 0;
+    }
   }
 
-  private enableFullScreen(): void {
+  private enterImmersiveMode(): void {
     const hostContext = this.getUIContext().getHostContext();
     if (hostContext === undefined) {
       return;
     }
     window.getLastWindow(hostContext).then((win: window.Window) => {
-      this.hostWindow = win;
+      if (!this.pageActive) {
+        return;
+      }
       const avoidArea: window.AvoidArea = win.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM);
       const topInset: number = this.getUIContext().px2vp(avoidArea.topRect.height);
       if (topInset > 0) {
         this.statusBarHeightVp = topInset;
       }
-      win.setWindowLayoutFullScreen(true).catch((error: BusinessError) => {
-        console.error(`setWindowLayoutFullScreen failed, code=${error.code}`);
-      });
-      win.setWindowSystemBarProperties({
-        statusBarContentColor: '#FFFFFF',
-        navigationBarContentColor: '#FFFFFF'
-      }).catch((error: BusinessError) => {
-        console.error(`setWindowSystemBarProperties failed, code=${error.code}`);
-      });
+      this.windowToken = WindowModeController.acquire(win, '#FFFFFF');
     }).catch((error: BusinessError) => {
       console.error(`getLastWindow failed, code=${error.code}`);
     });
-  }
-
-  private restoreWindowMode(): void {
-    const win: window.Window | undefined = this.hostWindow;
-    if (win === undefined) {
-      return;
-    }
-    win.setWindowLayoutFullScreen(false).catch((error: BusinessError) => {
-      console.error(`setWindowLayoutFullScreen failed, code=${error.code}`);
-    });
-    win.setWindowSystemBarProperties({
-      statusBarContentColor: '#000000',
-      navigationBarContentColor: '#000000'
-    }).catch((error: BusinessError) => {
-      console.error(`setWindowSystemBarProperties failed, code=${error.code}`);
-    });
-    this.hostWindow = undefined;
   }
 
   /** 弹层内容随窗口宽度等比放大，越宽的窗口弹层越高 */
