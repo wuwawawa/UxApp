@@ -2,15 +2,15 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "module description"
+      "value": "折叠屏 / 大屏适配问题复现与验证"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "description"
+      "value": "UX 反例集：折叠屏适配反例与截断复现"
     },
     {
       "name": "EntryAbility_label",
-      "value": "label"
+      "value": "UX 反例集"
     }
   ]
 }
