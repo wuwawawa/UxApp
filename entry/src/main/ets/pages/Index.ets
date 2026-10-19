@@ -14,6 +14,7 @@
  */
 
 import { FilterDialogTruncationPage } from './truncation/FilterDialogTruncation';
+import { VipRenewalSheetTruncationPage } from './truncation/VipRenewalSheetTruncation';
 
 /**
  * 反例目录首页。
@@ -48,6 +49,12 @@ const CASE_CATALOG: CaseCategory[] = [
         caseTitle: '购票场景文字截断',
         caseSummary: '',
         caseTag: 'Pura X Max'
+      },
+      {
+        caseRoute: 'truncation/vip-renewal-sheet',
+        caseTitle: '会员续费弹层截断',
+        caseSummary: '',
+        caseTag: 'Pura X Max'
       }
     ]
   }
@@ -62,6 +69,8 @@ struct Index {
   caseDestination(routeName: string) {
     if (routeName === 'truncation/filter-dialog') {
       FilterDialogTruncationPage({ pageStack: this.navStack })
+    } else if (routeName === 'truncation/vip-renewal-sheet') {
+      VipRenewalSheetTruncationPage({ pageStack: this.navStack })
     }
   }
 
