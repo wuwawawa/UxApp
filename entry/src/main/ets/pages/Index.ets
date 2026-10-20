@@ -30,12 +30,15 @@ import { CouponRulesDialogTruncationPage } from './truncation/CouponRulesDialogT
  * 新增案例的步骤：
  *   1. 在 pages/ 下新建页面组件（NavDestination 作为根节点，参数 pageStack: NavPathStack）；
  *   2. 在文件末尾的「案例页面构建函数」区补一个全局 @Builder，内部实例化该页面；
- *   3. 在 CASE_CATALOG 里追加一条 CaseEntry，caseRoute 唯一、casePage 指向刚补的 @Builder。
+ *   3. 在 CASE_CATALOG 里追加一条 CaseEntry：caseRoute 唯一、caseTag 写案例类型
+ *      （如「弹窗截断」）、casePage 指向刚补的 @Builder。
  */
 
 interface CaseEntry {
   caseRoute: string;
   caseTitle: string;
+  /** 案例类型标签（如「弹窗截断」），不是机型 */
+  caseTag: string;
   /** 卡片左侧的单字图标 */
   caseIcon: string;
   /** 该案例的页面构建函数，按 caseRoute 查找后直接构建 */
@@ -118,36 +121,42 @@ const CASE_CATALOG: CaseCategory[] = [
       {
         caseRoute: 'truncation/filter-dialog',
         caseTitle: '购票场景文字截断',
+        caseTag: '弹窗截断',
         caseIcon: '票',
         casePage: wrapBuilder(filterDialogCasePage)
       },
       {
         caseRoute: 'truncation/vip-renewal-sheet',
         caseTitle: '会员续费弹层截断',
+        caseTag: '弹窗截断',
         caseIcon: '会',
         casePage: wrapBuilder(vipRenewalCasePage)
       },
       {
         caseRoute: 'truncation/hema-task-sheet',
         caseTitle: '盒马签到弹层截断',
+        caseTag: '弹窗截断',
         caseIcon: '签',
         casePage: wrapBuilder(hemaTaskSheetCasePage)
       },
       {
         caseRoute: 'truncation/hema-my-menu',
         caseTitle: '盒马我的菜单截断',
+        caseTag: '弹窗截断',
         caseIcon: '单',
         casePage: wrapBuilder(hemaMyMenuCasePage)
       },
       {
         caseRoute: 'truncation/bike-card-gift',
         caseTitle: '美团骑行卡赠送弹窗截断',
+        caseTag: '弹窗截断',
         caseIcon: '骑',
         casePage: wrapBuilder(bikeGiftCasePage)
       },
       {
         caseRoute: 'truncation/coupon-rules-dialog',
         caseTitle: '美团神券规则弹窗截断',
+        caseTag: '弹窗截断',
         caseIcon: '券',
         casePage: wrapBuilder(couponRulesCasePage)
       }
@@ -190,12 +199,25 @@ struct Index {
         .backgroundColor('#EAF1FF')
         .borderRadius(12)
 
-      Text(caseEntry.caseTitle)
-        .fontSize(17)
-        .fontWeight(FontWeight.Medium)
-        .fontColor('#1A1D21')
-        .layoutWeight(1)
-        .margin({ left: 14 })
+      Row() {
+        Text(caseEntry.caseTitle)
+          .fontSize(17)
+          .fontWeight(FontWeight.Medium)
+          .fontColor('#1A1D21')
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+        Text(caseEntry.caseTag)
+          .fontSize(11)
+          .fontColor('#1B6FE3')
+          .backgroundColor('#EAF1FF')
+          .borderRadius(4)
+          .padding({ left: 6, right: 6, top: 2, bottom: 2 })
+          .margin({ left: 8 })
+      }
+      .layoutWeight(1)
+      .alignItems(VerticalAlign.Center)
+      .margin({ left: 14 })
 
       Text('›')
         .fontSize(26)
