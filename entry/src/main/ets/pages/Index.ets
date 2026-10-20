@@ -18,6 +18,7 @@ import { HemaTaskSheetTruncationPage } from './truncation/HemaTaskSheetTruncatio
 import { HemaMyMenuTruncationPage } from './truncation/HemaMyMenuTruncation';
 import { VipRenewalSheetTruncationPage } from './truncation/VipRenewalSheetTruncation';
 import { BikeGiftDialogTruncationPage } from './truncation/BikeGiftDialogTruncation';
+import { CouponRulesDialogTruncationPage } from './truncation/CouponRulesDialogTruncation';
 
 /**
  * 反例目录首页。
@@ -76,6 +77,12 @@ const CASE_CATALOG: CaseCategory[] = [
         caseTitle: '美团骑行卡赠送弹窗截断',
         caseSummary: '',
         caseTag: 'Pura X Max'
+      },
+      {
+        caseRoute: 'truncation/coupon-rules-dialog',
+        caseTitle: '美团神券规则弹窗截断',
+        caseSummary: '',
+        caseTag: 'Pura X Max'
       }
     ]
   }
@@ -98,6 +105,8 @@ struct Index {
       HemaMyMenuTruncationPage({ pageStack: this.navStack })
     } else if (routeName === 'truncation/bike-card-gift') {
       BikeGiftDialogTruncationPage({ pageStack: this.navStack })
+    } else if (routeName === 'truncation/coupon-rules-dialog') {
+      CouponRulesDialogTruncationPage({ pageStack: this.navStack })
     }
   }
 
