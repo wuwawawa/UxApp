@@ -5,7 +5,8 @@
 **不允许留下任何能直接得到答案的东西**（见下一节「铁律」）。
 
 - 应用包名：`com.example.helloworld`（入口 Ability：`EntryAbility`，首页 `pages/Index`）
-- 当前内容：4 个问题分类，其中「截断重叠」8 个案例、「大图大字」2 个案例，另 2 个分类待补
+- 当前内容：4 个问题分类，其中「截断重叠」8 个案例、「未避让安全区」1 个案例、
+  「大图大字」2 个案例，另 1 个分类待补
 - 验证方式：以常驻模拟器为主，设备名 / 序列号每次用 `devecocli device list` 现查，
   命令里显式指定 `--device` / `--target`（详见第三节）
 
@@ -66,6 +67,9 @@ UxApp/
 │       │       │   ├── CouponRulesDialogTruncation.ets
 │       │       │   ├── PharmacySearchTruncation.ets
 │       │       │   └── LoginPageOverlapTruncation.ets
+│       │       ├── safearea/                  # 分类 02「未避让安全区」
+│       │       │   ├── SafeAreaCaseList.ets        # 分类页：案例表 + 搜索/标签筛选 + 页面注册
+│       │       │   └── FlightFilterStatusBar.ets   # 机票筛选面板压状态栏
 │       │       └── bigcontent/                # 分类 04「大图大字」
 │       │           ├── BigContentCaseList.ets      # 分类页：案例表 + 页面注册
 │       │           ├── PharmacyProductBigImage.ets # 看病买药商品图放大

@@ -26,6 +26,11 @@ import {
   BIG_CONTENT_CATEGORY_PAGE,
   resolveBigContentCasePage
 } from './bigcontent/BigContentCaseList';
+import {
+  SAFE_AREA_CASE_COUNT,
+  SAFE_AREA_CATEGORY_PAGE,
+  resolveSafeAreaCasePage
+} from './safearea/SafeAreaCaseList';
 
 /**
  * 反例目录首页：按问题类型分类。
@@ -49,11 +54,6 @@ interface HomeCategory {
   /** 已有案例数；0 表示分类还在整理，进入占位页 */
   categoryCaseCount: number;
   categoryPage: WrappedBuilder<[NavPathStack]>;
-}
-
-@Builder
-function safeAreaCategoryPage(pageStack: NavPathStack) {
-  CategoryPlaceholderPage({ pageStack: pageStack, categoryTitle: '未避让安全区' })
 }
 
 @Builder
@@ -108,8 +108,8 @@ const HOME_CATEGORIES: HomeCategory[] = [
     categoryIndex: '02',
     categoryTitle: '未避让安全区',
     categoryDesc: '内容压到状态栏、导航条、挖孔区域',
-    categoryCaseCount: 0,
-    categoryPage: wrapBuilder(safeAreaCategoryPage)
+    categoryCaseCount: SAFE_AREA_CASE_COUNT,
+    categoryPage: SAFE_AREA_CATEGORY_PAGE
   },
   {
     categoryRoute: 'category/margin',
@@ -139,6 +139,10 @@ function resolvePage(routeName: string): WrappedBuilder<[NavPathStack]> {
   const casePage: WrappedBuilder<[NavPathStack]> | undefined = resolveTruncationCasePage(routeName);
   if (casePage !== undefined) {
     return casePage;
+  }
+  const safeAreaCasePage: WrappedBuilder<[NavPathStack]> | undefined = resolveSafeAreaCasePage(routeName);
+  if (safeAreaCasePage !== undefined) {
+    return safeAreaCasePage;
   }
   const bigContentCasePage: WrappedBuilder<[NavPathStack]> | undefined = resolveBigContentCasePage(routeName);
   if (bigContentCasePage !== undefined) {
