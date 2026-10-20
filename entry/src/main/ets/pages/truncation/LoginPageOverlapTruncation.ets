@@ -38,8 +38,6 @@
  *   下方 10.2vp，而不是图标行上方，于是标签被整体上提 41vp
  *   （LOGIN_COMPACT_LABEL_LIFT），offset 不参与布局，标签就叠到了
  *   「验证码登录」那一行上。竖屏窗口高度够，不走这条分支，所以看不到重叠。
- *
- * 把 isCompactLandscape() 改成 return false; 即可看到三个屏态都正常的样子。
  */
 
 import { window } from '@kit.ArkUI';
@@ -175,11 +173,6 @@ export struct LoginPageOverlapTruncationPage {
     });
   }
 
-  /** 双屏态横屏：窗口宽 > 高。只有这一态走进旧版的横屏紧凑分支 */
-  private isCompactLandscape(): boolean {
-    return this.winWidthVp > this.winHeightVp;
-  }
-
   /** 把一串 vp 坐标换算成 Path commands 需要的 px 字符串 */
   private pathPoints(values: number[]): string {
     const points: string[] = [];
@@ -212,9 +205,12 @@ export struct LoginPageOverlapTruncationPage {
       ' L' + this.pathPoints([4.5, 5.5]) + ' Z';
   }
 
-  /** 「其他登录方式」的向上偏移：横屏紧凑态才非 0 */
+  /** 「其他登录方式」的向上偏移：横屏（窗口宽 > 高）才非 0 */
   private otherMethodLiftVp(): number {
-    return this.isCompactLandscape() ? LOGIN_COMPACT_LABEL_LIFT : 0;
+    if (this.winWidthVp > this.winHeightVp) {
+      return LOGIN_COMPACT_LABEL_LIFT;
+    }
+    return 0;
   }
 
   // ------------------------------------------------------------------

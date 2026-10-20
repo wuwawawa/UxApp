@@ -21,27 +21,15 @@
  * 两列商品卡片（商品图 + 标题 + 月售 + 价格 + 送达时间）、底部 TabBar
  * 以及浮在 TabBar 上方的「小团健康管家」气泡。
  *
- * 商品卡与商品图的尺寸都按单屏态截图（459.6×672vp，密度 2.75）量出的设计值摆放：
- *   单屏态        459.6×672vp   —— 正常：列宽 217vp，商品图 217×217vp 正方形
- *   双屏态竖屏    664.7×939.6vp —— 正常：列宽 320vp，商品图 320×320vp 正方形
- *   双屏态横屏    939.6×664.7vp —— 异常：列宽 457vp，商品图 457×399vp，
- *                                 一张商品图吃掉六成屏高，一屏只放得下一行商品，
- *                                 标题被挤到屏幕最下方、字号却还是单屏态大小
+ * 商品图取自截图裁出的真实商品图，卡片尺寸按单屏态截图
+ * （459.6×672vp，1264×1848px，密度 2.75）量出的设计值摆放。
  *
- * 问题表现（双屏态横屏）：
- *   同一套「两列商品卡」布局，在 939.6vp 宽的横屏窗口里每一列都被撑到 457vp，
- *   商品图随之放大到单屏态的 2.1 倍宽 / 1.8 倍高，一屏只能看到一行商品，
- *   而标题、月售、价格仍是固定的 fp 字号，图文比例彻底失衡，看起来就是「图异常大」。
- *
- * 根因：商品图只有高度受了约束，宽度完全跟着列宽走，而列数被写死成 2 列：
- *   1. 图片宽度 = 卡片宽度（width('100%')），卡片宽度 = (窗口宽度 - 左右留白 - 列间距) / 2，
- *      横屏时窗口宽度翻倍，列宽跟着翻倍，图片宽度也翻倍；
- *   2. 图片高度 = min(列宽, 窗口高度 × 0.6)：横屏列宽 457vp 超过 0.6 屏高（398.8vp），
- *      高度被截到 399vp，图片从 1:1 变成 1.15:1，objectFit(Cover) 再把图片左右放大裁切；
- *   3. 标题、月售、价格是固定 fp 字号，不随图片缩放，于是「图越大、字越小」。
- *
- * 把 BIG_GRID_ADAPTIVE_COLUMNS 改成 true 即可看到三个屏态都正常的样子：
- * 列数按可用宽度算（横屏 4 列），卡片宽度回到单屏态的 217vp 左右，商品图重新变成正方形。
+ * 三个屏态的实测结果：
+ *   单屏态        459.6×672vp   —— 列宽 217vp，商品图 217×217vp
+ *   双屏态竖屏    664.7×939.6vp —— 列宽 320vp，商品图 320×320vp
+ *   双屏态横屏    939.6×664.7vp —— 商品图 457×399vp，占掉六成屏高，
+ *                                 一屏只放得下一行商品，标题被压到 TabBar 上沿，
+ *                                 价格被裁掉，字号却还是单屏态大小
  */
 
 import { window } from '@kit.ArkUI';
@@ -60,16 +48,10 @@ const BIG_GRID_ROW_GAP: number = 7.5;
 const BIG_GRID_TOP_GAP: number = 7.5;
 const BIG_GRID_BOTTOM_GAP: number = 8;
 
-/** 列数写死 2 列（单屏态设计），横屏也不变 */
-const BIG_GRID_FIXED_COLUMNS: number = 2;
-/** 单屏态卡片宽度：(459.6 - 8.5 × 2 - 8.5) / 2 ≈ 217vp，修好后的目标卡片宽度 */
-const BIG_DESIGN_CARD_WIDTH: number = 217;
+/** 商品网格列数：单屏态设计为两列 */
+const BIG_GRID_COLUMNS: number = 2;
 
-/**
- * 商品图高度上限 = 窗口高度 × 0.6。
- * 横屏列宽 457vp 已经超过 0.6 屏高（398.8vp），图片高度在这里被截断，
- * 但宽度仍然是列宽，图片因此从 1:1 变成 1.15:1。
- */
+/** 商品图最大高度占窗口高度的比例 */
 const BIG_IMAGE_MAX_HEIGHT_RATIO: number = 0.6;
 
 /** 头部：搜索行高 / 搜索框高 / 频道栏高 / 频道胶囊高（单屏态截图折算） */
@@ -87,13 +69,6 @@ const BIG_BOTTOM_INSET_FALLBACK: number = 8;
 
 /** 页面底色：商品网格的缝隙色 */
 const BIG_PAGE_BG: string = '#F6F6F7';
-
-/**
- * 适配开关，复刻问题时保持 false：
- *   false —— 固定 2 列，图片跟着列宽放大（复刻出的问题）
- *   true  —— 列数按可用宽度算（横屏 4 列），卡片回到 217vp，图片重新变正方形（正常）
- */
-const BIG_GRID_ADAPTIVE_COLUMNS: boolean = false;
 
 interface BigProductItem {
   productId: string;
@@ -212,43 +187,18 @@ export struct PharmacyProductBigImagePage {
   // 尺寸计算：商品卡与商品图的大小全部由窗口宽高推出来
   // ------------------------------------------------------------------
 
-  /** 网格列数：复刻问题时固定 2 列；修好后按可用宽度能塞几列算几列 */
-  private columnCount(): number {
-    if (!BIG_GRID_ADAPTIVE_COLUMNS) {
-      return BIG_GRID_FIXED_COLUMNS;
-    }
-    const usableWidth: number = this.winWidthVp - BIG_GRID_SIDE_INSET * 2;
-    const fitCount: number = Math.floor(
-      (usableWidth + BIG_GRID_COLUMN_GAP) / (BIG_DESIGN_CARD_WIDTH + BIG_GRID_COLUMN_GAP));
-    return fitCount < BIG_GRID_FIXED_COLUMNS ? BIG_GRID_FIXED_COLUMNS : fitCount;
-  }
-
-  /** 卡片宽度 = 可用宽度按列数均分，横屏列宽会跟着窗口宽翻倍 */
+  /** 卡片宽度 = 可用宽度按列数均分 */
   private cardWidthVp(): number {
-    const columnCount: number = this.columnCount();
     const usableWidth: number = this.winWidthVp - BIG_GRID_SIDE_INSET * 2 -
-      BIG_GRID_COLUMN_GAP * (columnCount - 1);
-    return usableWidth / columnCount;
+      BIG_GRID_COLUMN_GAP * (BIG_GRID_COLUMNS - 1);
+    return usableWidth / BIG_GRID_COLUMNS;
   }
 
-  /**
-   * 商品图高度：先按列宽取正方形，再被「不超过 0.6 屏高」的上限截断。
-   * 单屏态 / 双屏态竖屏走正方形分支，双屏态横屏走截断分支。
-   */
+  /** 商品图高度：与列宽一致（正方形），最高不超过窗口高度的 60% */
   private productImageHeightVp(): number {
     const squareHeight: number = this.cardWidthVp();
     const cappedHeight: number = this.winHeightVp * BIG_IMAGE_MAX_HEIGHT_RATIO;
     return Math.min(squareHeight, cappedHeight);
-  }
-
-  /** 把列数拼成 Grid 需要的 '1fr 1fr ...' 模板 */
-  private gridColumnsTemplate(): string {
-    const columnCount: number = this.columnCount();
-    let template: string = '';
-    for (let index: number = 0; index < columnCount; index++) {
-      template = index === 0 ? '1fr' : template + ' 1fr';
-    }
-    return template;
   }
 
   // ------------------------------------------------------------------
@@ -548,7 +498,7 @@ export struct PharmacyProductBigImagePage {
               }
             }, (product: BigProductItem) => product.productId)
           }
-          .columnsTemplate(this.gridColumnsTemplate())
+          .columnsTemplate('1fr 1fr')
           .columnsGap(BIG_GRID_COLUMN_GAP)
           .rowsGap(BIG_GRID_ROW_GAP)
           .padding({

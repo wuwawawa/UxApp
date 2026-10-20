@@ -37,8 +37,6 @@
  * 整体上提了搜索框高度的一半（PHARMACY_COMPACT_LIFT），容器高度同步减掉同样的值，
  * 但搜索框自身的高度、字号、内边距都没有跟着缩，多出来的半个搜索框就落在裁剪区外。
  * 竖屏（单屏 / 双屏态竖屏）窗口高度够用，不走这条横屏分支，所以看不到截断。
- *
- * 把 isCompactLandscape() 改成 return false; 即可看到三个屏态都正常的样子。
  */
 
 import { window } from '@kit.ArkUI';
@@ -195,14 +193,12 @@ export struct PharmacySearchTruncationPage {
     });
   }
 
-  /** 双屏态横屏：窗口宽 > 高。只有这一态走「横屏紧凑」分支 */
-  private isCompactLandscape(): boolean {
-    return this.winWidthVp > this.winHeightVp;
-  }
-
-  /** 搜索区整体上提量：横屏上提半个搜索框，竖屏不上提 */
+  /** 搜索区整体上提量：横屏（窗口宽 > 高）上提半个搜索框，竖屏不上提 */
   private searchZoneLiftVp(): number {
-    return this.isCompactLandscape() ? PHARMACY_COMPACT_LIFT : 0;
+    if (this.winWidthVp > this.winHeightVp) {
+      return PHARMACY_COMPACT_LIFT;
+    }
+    return 0;
   }
 
   /**
