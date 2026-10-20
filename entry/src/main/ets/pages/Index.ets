@@ -13,88 +13,67 @@
  * limitations under the License.
  */
 
-import { FilterDialogTruncationPage } from './truncation/FilterDialogTruncation';
-import { HemaTaskSheetTruncationPage } from './truncation/HemaTaskSheetTruncation';
-import { HemaMyMenuTruncationPage } from './truncation/HemaMyMenuTruncation';
-import { VipRenewalSheetTruncationPage } from './truncation/VipRenewalSheetTruncation';
-import { BikeGiftDialogTruncationPage } from './truncation/BikeGiftDialogTruncation';
-import { CouponRulesDialogTruncationPage } from './truncation/CouponRulesDialogTruncation';
+import { window } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { CategoryPlaceholderPage } from './CategoryPlaceholder';
+import {
+  TRUNCATION_CASE_COUNT,
+  TRUNCATION_CATEGORY_PAGE,
+  resolveTruncationCasePage
+} from './truncation/TruncationCaseList';
 
 /**
- * 反例目录首页。
+ * 反例目录首页：按问题类型分类。
  *
- * 案例的「列表项 + 路由目标」统一收敛在 CASE_CATALOG 里：每条 CaseEntry 自带
- * caseRoute、标题、图标和页面构建函数，新增案例只改这一处数据，不再维护
- * route -> 页面 的 if/else 分发。
+ * 路由分两层：
+ *   1. 首页只负责「问题分类」，每个分类对应一个分类页；
+ *   2. 分类页内部再列出具体案例（如 pages/truncation/TruncationCaseList）。
+ * 两层都往同一个 NavPathStack 压栈，案例页面统一由首页的 navDestination 构建：
+ * resolvePage 先查分类表，再交给各分类的案例解析函数。
  *
- * 新增案例的步骤：
- *   1. 在 pages/ 下新建页面组件（NavDestination 作为根节点，参数 pageStack: NavPathStack）；
- *   2. 在文件末尾的「案例页面构建函数」区补一个全局 @Builder，内部实例化该页面；
- *   3. 在 CASE_CATALOG 里追加一条 CaseEntry：caseRoute 唯一、caseTag 写案例类型
- *      （如「弹窗截断」）、casePage 指向刚补的 @Builder。
+ * 新增分类：在 HOME_CATEGORIES 追加一项，并补一个分类页 @Builder。
+ * 新增案例：在对应分类文件里追加 CaseEntry 即可，首页无需改动。
  */
 
-interface CaseEntry {
-  caseRoute: string;
-  caseTitle: string;
-  /** 案例类型标签（如「弹窗截断」），不是机型 */
-  caseTag: string;
-  /** 卡片左侧的单字图标 */
-  caseIcon: string;
-  /** 该案例的页面构建函数，按 caseRoute 查找后直接构建 */
-  casePage: WrappedBuilder<[NavPathStack]>;
-}
-
-interface CaseCategory {
+interface HomeCategory {
+  categoryRoute: string;
+  /** 卡片左上角的序号 */
+  categoryIndex: string;
   categoryTitle: string;
-  categoryHint: string;
-  categoryCases: CaseEntry[];
-}
-
-/** 案例页面构建函数：统一只传入导航栈 */
-@Builder
-function filterDialogCasePage(pageStack: NavPathStack) {
-  FilterDialogTruncationPage({ pageStack: pageStack })
+  categoryDesc: string;
+  /** 已有案例数；0 表示分类还在整理，进入占位页 */
+  categoryCaseCount: number;
+  categoryPage: WrappedBuilder<[NavPathStack]>;
 }
 
 @Builder
-function vipRenewalCasePage(pageStack: NavPathStack) {
-  VipRenewalSheetTruncationPage({ pageStack: pageStack })
+function safeAreaCategoryPage(pageStack: NavPathStack) {
+  CategoryPlaceholderPage({ pageStack: pageStack, categoryTitle: '未避让安全区' })
 }
 
 @Builder
-function hemaTaskSheetCasePage(pageStack: NavPathStack) {
-  HemaTaskSheetTruncationPage({ pageStack: pageStack })
+function marginCategoryPage(pageStack: NavPathStack) {
+  CategoryPlaceholderPage({ pageStack: pageStack, categoryTitle: '边距过大' })
 }
 
 @Builder
-function hemaMyMenuCasePage(pageStack: NavPathStack) {
-  HemaMyMenuTruncationPage({ pageStack: pageStack })
+function bigContentCategoryPage(pageStack: NavPathStack) {
+  CategoryPlaceholderPage({ pageStack: pageStack, categoryTitle: '大图大字' })
 }
 
+/** 路由未登记时的兜底页，避免白屏 */
 @Builder
-function bikeGiftCasePage(pageStack: NavPathStack) {
-  BikeGiftDialogTruncationPage({ pageStack: pageStack })
-}
-
-@Builder
-function couponRulesCasePage(pageStack: NavPathStack) {
-  CouponRulesDialogTruncationPage({ pageStack: pageStack })
-}
-
-/** 路由找不到对应案例时的兜底页面，避免白屏 */
-@Builder
-function caseNotFoundPage(pageStack: NavPathStack) {
+function routeNotFoundPage(pageStack: NavPathStack) {
   NavDestination() {
     Column({ space: 10 }) {
-      Text('案例页面不存在')
+      Text('页面不存在')
         .fontSize(16)
         .fontWeight(FontWeight.Medium)
-        .fontColor('#1A1D21')
+        .fontColor('#14161A')
 
-      Text('请检查 CASE_CATALOG 中该案例的 casePage 是否已登记')
+      Text('该路由未在首页分类表或案例表中登记')
         .fontSize(12)
-        .fontColor('#8A8F99')
+        .fontColor('#7A756B')
 
       Button('返回')
         .fontSize(14)
@@ -106,73 +85,62 @@ function caseNotFoundPage(pageStack: NavPathStack) {
     }
     .width('100%')
     .height('100%')
+    .backgroundColor('#F4F2EC')
     .justifyContent(FlexAlign.Center)
   }
   .hideTitleBar(true)
 }
 
-const CASE_NOT_FOUND_PAGE: WrappedBuilder<[NavPathStack]> = wrapBuilder(caseNotFoundPage);
+const ROUTE_NOT_FOUND_PAGE: WrappedBuilder<[NavPathStack]> = wrapBuilder(routeNotFoundPage);
 
-const CASE_CATALOG: CaseCategory[] = [
+/** 首页分类表：顺序即展示顺序，两列排布 */
+const HOME_CATEGORIES: HomeCategory[] = [
   {
-    categoryTitle: '截断',
-    categoryHint: '文字 / 内容被父容器裁切、显示不全',
-    categoryCases: [
-      {
-        caseRoute: 'truncation/filter-dialog',
-        caseTitle: '购票场景文字截断',
-        caseTag: '弹窗截断',
-        caseIcon: '票',
-        casePage: wrapBuilder(filterDialogCasePage)
-      },
-      {
-        caseRoute: 'truncation/vip-renewal-sheet',
-        caseTitle: '会员续费弹层截断',
-        caseTag: '弹窗截断',
-        caseIcon: '会',
-        casePage: wrapBuilder(vipRenewalCasePage)
-      },
-      {
-        caseRoute: 'truncation/hema-task-sheet',
-        caseTitle: '盒马签到弹层截断',
-        caseTag: '弹窗截断',
-        caseIcon: '签',
-        casePage: wrapBuilder(hemaTaskSheetCasePage)
-      },
-      {
-        caseRoute: 'truncation/hema-my-menu',
-        caseTitle: '盒马我的菜单截断',
-        caseTag: '弹窗截断',
-        caseIcon: '单',
-        casePage: wrapBuilder(hemaMyMenuCasePage)
-      },
-      {
-        caseRoute: 'truncation/bike-card-gift',
-        caseTitle: '美团骑行卡赠送弹窗截断',
-        caseTag: '弹窗截断',
-        caseIcon: '骑',
-        casePage: wrapBuilder(bikeGiftCasePage)
-      },
-      {
-        caseRoute: 'truncation/coupon-rules-dialog',
-        caseTitle: '美团神券规则弹窗截断',
-        caseTag: '弹窗截断',
-        caseIcon: '券',
-        casePage: wrapBuilder(couponRulesCasePage)
-      }
-    ]
+    categoryRoute: 'truncation',
+    categoryIndex: '01',
+    categoryTitle: '截断重叠',
+    categoryDesc: '弹窗、弹层的文字被父容器裁切，显示不全',
+    categoryCaseCount: TRUNCATION_CASE_COUNT,
+    categoryPage: TRUNCATION_CATEGORY_PAGE
+  },
+  {
+    categoryRoute: 'category/safe-area',
+    categoryIndex: '02',
+    categoryTitle: '未避让安全区',
+    categoryDesc: '内容压到状态栏、导航条、挖孔区域',
+    categoryCaseCount: 0,
+    categoryPage: wrapBuilder(safeAreaCategoryPage)
+  },
+  {
+    categoryRoute: 'category/margin',
+    categoryIndex: '03',
+    categoryTitle: '边距过大',
+    categoryDesc: '折叠态 / 展开态间距失衡，留白明显过多',
+    categoryCaseCount: 0,
+    categoryPage: wrapBuilder(marginCategoryPage)
+  },
+  {
+    categoryRoute: 'category/big-content',
+    categoryIndex: '04',
+    categoryTitle: '大图大字',
+    categoryDesc: '图片与字号随窗口等比放大，溢出屏幕',
+    categoryCaseCount: 0,
+    categoryPage: wrapBuilder(bigContentCategoryPage)
   }
 ];
 
-function findCasePage(routeName: string): WrappedBuilder<[NavPathStack]> {
-  for (const category of CASE_CATALOG) {
-    for (const caseEntry of category.categoryCases) {
-      if (caseEntry.caseRoute === routeName) {
-        return caseEntry.casePage;
-      }
+/** 分类页 + 各分类下的案例页，统一在这里解析 */
+function resolvePage(routeName: string): WrappedBuilder<[NavPathStack]> {
+  for (const category of HOME_CATEGORIES) {
+    if (category.categoryRoute === routeName) {
+      return category.categoryPage;
     }
   }
-  return CASE_NOT_FOUND_PAGE;
+  const casePage: WrappedBuilder<[NavPathStack]> | undefined = resolveTruncationCasePage(routeName);
+  if (casePage !== undefined) {
+    return casePage;
+  }
+  return ROUTE_NOT_FOUND_PAGE;
 }
 
 @Entry
@@ -180,96 +148,134 @@ function findCasePage(routeName: string): WrappedBuilder<[NavPathStack]> {
 struct Index {
   private navStack: NavPathStack = new NavPathStack();
 
-  @Builder
-  caseDestination(routeName: string) {
-    // 路由表查找 + 动态构建，新增案例不需要再改这里
-    findCasePage(routeName).builder(this.navStack);
+  aboutToAppear(): void {
+    // 让状态栏、导航条区域与纸色页面背景一致，避免顶部出现一条白边
+    const hostContext = this.getUIContext().getHostContext();
+    if (hostContext === undefined) {
+      return;
+    }
+    window.getLastWindow(hostContext).then((win: window.Window) => {
+      win.setWindowBackgroundColor('#F4F2EC');
+    }).catch((error: BusinessError) => {
+      console.error(`setWindowBackgroundColor failed, code=${error.code}`);
+    });
   }
 
   @Builder
-  caseCard(caseEntry: CaseEntry) {
-    Row() {
-      Text(caseEntry.caseIcon)
-        .fontSize(18)
-        .fontWeight(FontWeight.Medium)
-        .fontColor('#1B6FE3')
-        .width(44)
-        .height(44)
-        .textAlign(TextAlign.Center)
-        .backgroundColor('#EAF1FF')
-        .borderRadius(12)
+  categoryDestination(routeName: string) {
+    resolvePage(routeName).builder(this.navStack);
+  }
 
+  /** 两列网格的总高度：每行 172vp，行间距 12vp */
+  private categoryGridHeight(): number {
+    const rows: number = Math.ceil(HOME_CATEGORIES.length / 2);
+    return rows * 172 + (rows - 1) * 12;
+  }
+
+  @Builder
+  pageHeader() {
+    Column() {
       Row() {
-        Text(caseEntry.caseTitle)
-          .fontSize(17)
-          .fontWeight(FontWeight.Medium)
-          .fontColor('#1A1D21')
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text('UX / ANTIPATTERN')
+          .fontSize(10)
+          .letterSpacing(3)
+          .fontColor('#8A857A')
 
-        Text(caseEntry.caseTag)
-          .fontSize(11)
-          .fontColor('#1B6FE3')
-          .backgroundColor('#EAF1FF')
-          .borderRadius(4)
-          .padding({ left: 6, right: 6, top: 2, bottom: 2 })
-          .margin({ left: 8 })
+        Blank()
+
+        Text('折叠屏 · 大屏')
+          .fontSize(10)
+          .letterSpacing(1)
+          .fontColor('#8A857A')
       }
-      .layoutWeight(1)
-      .alignItems(VerticalAlign.Center)
-      .margin({ left: 14 })
+      .width('100%')
 
-      Text('›')
-        .fontSize(26)
-        .fontColor('#C4C8D0')
-        .margin({ left: 8 })
+      Text('问题分类')
+        .fontSize(44)
+        .fontWeight(FontWeight.Bold)
+        .fontColor('#14161A')
+        .margin({ top: 12 })
+
+      Text('按问题类型归档的适配反例，进入分类查看具体案例')
+        .fontSize(12)
+        .fontColor('#6B665C')
+        .margin({ top: 8 })
+
+      Row()
+        .width(56)
+        .height(4)
+        .backgroundColor('#E2452B')
+        .margin({ top: 16 })
     }
     .width('100%')
-    .padding(16)
-    .backgroundColor(Color.White)
-    .borderRadius(16)
-    .margin({ bottom: 12 })
+    .padding({ top: 18, bottom: 24 })
+    .alignItems(HorizontalAlign.Start)
+  }
+
+  @Builder
+  categoryTile(category: HomeCategory) {
+    Column() {
+      Row() {
+        Text(category.categoryIndex)
+          .fontSize(30)
+          .fontWeight(FontWeight.Bold)
+          .fontStyle(FontStyle.Italic)
+          .fontColor(category.categoryCaseCount > 0 ? '#14161A' : '#C6C0B2')
+
+        Blank()
+
+        if (category.categoryCaseCount > 0) {
+          Text(category.categoryCaseCount.toString() + ' 案例')
+            .fontSize(9)
+            .fontColor('#E2452B')
+            .border({ width: 1, color: '#E2452B' })
+            .borderRadius(8)
+            .padding({ left: 6, right: 6, top: 2, bottom: 2 })
+        } else {
+          Text('整理中')
+            .fontSize(9)
+            .fontColor('#9A958A')
+            .border({ width: 1, color: '#D8D2C4' })
+            .borderRadius(8)
+            .padding({ left: 6, right: 6, top: 2, bottom: 2 })
+        }
+      }
+      .width('100%')
+
+      Blank()
+
+      Text(category.categoryTitle)
+        .fontSize(21)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(category.categoryCaseCount > 0 ? '#14161A' : '#8A857A')
+
+      Text(category.categoryDesc)
+        .fontSize(10.5)
+        .lineHeight(16)
+        .fontColor('#7A756B')
+        .maxLines(2)
+        .margin({ top: 6 })
+    }
+    .width('100%')
+    .height(172)
+    .padding(15)
+    .alignItems(HorizontalAlign.Start)
+    .backgroundColor('#FBF9F4')
+    .border({ width: 1.5, color: category.categoryCaseCount > 0 ? '#14161A' : '#D8D2C4' })
+    .borderRadius(6)
     .onClick(() => {
-      this.navStack.pushPathByName(caseEntry.caseRoute, '');
+      this.navStack.pushPathByName(category.categoryRoute, '');
     })
   }
 
   @Builder
-  categorySection(category: CaseCategory) {
-    Column() {
-      Row() {
-        Row()
-          .width(3)
-          .height(15)
-          .backgroundColor('#1B6FE3')
-          .borderRadius(2)
-
-        Text(category.categoryTitle)
-          .fontSize(16)
-          .fontWeight(FontWeight.Bold)
-          .fontColor('#1A1D21')
-          .margin({ left: 8 })
-
-        Blank()
-
-        Text(category.categoryCases.length.toString() + ' 个案例')
-          .fontSize(11)
-          .fontColor('#9AA0A6')
-      }
+  pageFooter() {
+    Text('共 4 个分类 · 案例持续补充中')
+      .fontSize(10)
+      .lineHeight(16)
+      .fontColor('#A39D90')
       .width('100%')
-
-      Text(category.categoryHint)
-        .fontSize(12)
-        .fontColor('#9AA0A6')
-        .width('100%')
-        .margin({ top: 6, bottom: 12 })
-
-      ForEach(category.categoryCases, (caseEntry: CaseEntry) => {
-        this.caseCard(caseEntry)
-      }, (caseEntry: CaseEntry) => caseEntry.caseRoute)
-    }
-    .width('100%')
-    .margin({ bottom: 12 })
+      .margin({ top: 22 })
   }
 
   build() {
@@ -277,41 +283,28 @@ struct Index {
       Scroll() {
         Column() {
           Column() {
-            Column() {
-              Text('UX 反例集')
-                .fontSize(26)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(Color.White)
+            this.pageHeader()
 
-              Text('折叠屏 / 大屏适配问题复现与验证')
-                .fontSize(12)
-                .fontColor('#D6E4FF')
-                .margin({ top: 8 })
+            Grid() {
+              ForEach(HOME_CATEGORIES, (category: HomeCategory) => {
+                GridItem() {
+                  this.categoryTile(category)
+                }
+              }, (category: HomeCategory) => category.categoryRoute)
             }
             .width('100%')
-            .constraintSize({ maxWidth: 760 })
-            .alignItems(HorizontalAlign.Start)
-            .padding({ left: 16, right: 16 })
-          }
-          .width('100%')
-          .padding({ top: 24, bottom: 26 })
-          .backgroundColor('#1B6FE3')
+            .height(this.categoryGridHeight())
+            .columnsTemplate('1fr 1fr')
+            .columnsGap(12)
+            .rowsGap(12)
+            .scrollBar(BarState.Off)
 
-          Column() {
-            ForEach(CASE_CATALOG, (category: CaseCategory) => {
-              this.categorySection(category)
-            }, (category: CaseCategory) => category.categoryTitle)
-
-            Text('更多分类持续补充中…')
-              .fontSize(11)
-              .fontColor('#B0B5BD')
-              .width('100%')
-              .textAlign(TextAlign.Center)
-              .margin({ top: 8, bottom: 16 })
+            this.pageFooter()
           }
           .width('100%')
           .constraintSize({ maxWidth: 760 })
-          .padding({ left: 16, right: 16, top: 20, bottom: 12 })
+          .padding({ left: 20, right: 20, bottom: 24 })
+          .alignItems(HorizontalAlign.Start)
         }
         .width('100%')
         .alignItems(HorizontalAlign.Center)
@@ -319,12 +312,12 @@ struct Index {
       .width('100%')
       .height('100%')
       .scrollBar(BarState.Off)
-      .backgroundColor('#F4F5F7')
       .align(Alignment.Top)
+      .backgroundColor('#F4F2EC')
     }
-    .navDestination(this.caseDestination)
+    .navDestination(this.categoryDestination)
     .hideTitleBar(true)
     .mode(NavigationMode.Stack)
-    .backgroundColor('#F4F5F7')
+    .backgroundColor('#F4F2EC')
   }
 }
