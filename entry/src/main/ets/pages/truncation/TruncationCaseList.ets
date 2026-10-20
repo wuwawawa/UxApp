@@ -28,6 +28,7 @@ import { HemaMyMenuTruncationPage } from './HemaMyMenuTruncation';
 import { VipRenewalSheetTruncationPage } from './VipRenewalSheetTruncation';
 import { BikeGiftDialogTruncationPage } from './BikeGiftDialogTruncation';
 import { CouponRulesDialogTruncationPage } from './CouponRulesDialogTruncation';
+import { PharmacySearchTruncationPage } from './PharmacySearchTruncation';
 
 interface TruncationCaseEntry {
   caseRoute: string;
@@ -69,6 +70,11 @@ function bikeGiftCasePage(pageStack: NavPathStack) {
 @Builder
 function couponRulesCasePage(pageStack: NavPathStack) {
   CouponRulesDialogTruncationPage({ pageStack: pageStack })
+}
+
+@Builder
+function pharmacySearchCasePage(pageStack: NavPathStack) {
+  PharmacySearchTruncationPage({ pageStack: pageStack })
 }
 
 /** 截断重叠分类下的全部案例，新增案例时在这里追加一条 */
@@ -114,10 +120,61 @@ const TRUNCATION_CASES: TruncationCaseEntry[] = [
     caseTag: '弹窗截断',
     caseIcon: '券',
     casePage: wrapBuilder(couponRulesCasePage)
+  },
+  {
+    caseRoute: 'truncation/pharmacy-search',
+    caseTitle: '看病买药搜索框截断',
+    caseTag: '文字截断',
+    caseIcon: '药',
+    casePage: wrapBuilder(pharmacySearchCasePage)
   }
 ];
 
 export const TRUNCATION_CASE_COUNT: number = TRUNCATION_CASES.length;
+
+/** 「不限标签」的筛选值 */
+const TRUNCATION_ALL_TAG: string = '全部';
+
+interface TruncationTagChip {
+  tagLabel: string;
+  /** 该标签下的案例数，直接显示在筛选项上 */
+  tagCount: number;
+}
+
+/** 从案例表里收集出现过的标签（去重、保持首次出现顺序） */
+function collectTruncationTags(): string[] {
+  const tagLabels: string[] = [];
+  for (const caseEntry of TRUNCATION_CASES) {
+    if (tagLabels.indexOf(caseEntry.caseTag) < 0) {
+      tagLabels.push(caseEntry.caseTag);
+    }
+  }
+  return tagLabels;
+}
+
+function countTruncationCases(tagLabel: string): number {
+  let caseCount: number = 0;
+  for (const caseEntry of TRUNCATION_CASES) {
+    if (tagLabel === TRUNCATION_ALL_TAG || caseEntry.caseTag === tagLabel) {
+      caseCount += 1;
+    }
+  }
+  return caseCount;
+}
+
+/** 筛选栏数据：第一项「全部」，其余按案例表里出现的标签生成 */
+function buildTruncationTagChips(): TruncationTagChip[] {
+  const chips: TruncationTagChip[] = [
+    { tagLabel: TRUNCATION_ALL_TAG, tagCount: TRUNCATION_CASES.length }
+  ];
+  const tagLabels: string[] = collectTruncationTags();
+  for (const tagLabel of tagLabels) {
+    chips.push({ tagLabel: tagLabel, tagCount: countTruncationCases(tagLabel) });
+  }
+  return chips;
+}
+
+const TRUNCATION_TAG_CHIPS: TruncationTagChip[] = buildTruncationTagChips();
 
 /** 按 caseRoute 找案例页面，找不到返回 undefined，由首页兜底 */
 export function resolveTruncationCasePage(routeName: string): WrappedBuilder<[NavPathStack]> | undefined {
@@ -140,6 +197,155 @@ export const TRUNCATION_CATEGORY_PAGE: WrappedBuilder<[NavPathStack]> = wrapBuil
 @Component
 export struct TruncationCaseListPage {
   pageStack: NavPathStack = new NavPathStack();
+
+  /** 当前选中的标签，默认「全部」 */
+  @State activeTag: string = TRUNCATION_ALL_TAG;
+
+  /** 搜索关键词：同时匹配案例标题与标签 */
+  @State searchKeyword: string = '';
+
+  private listScroller: Scroller = new Scroller();
+
+  /** 标签 + 关键词双重过滤后的案例 */
+  private visibleCases(): TruncationCaseEntry[] {
+    const keyword: string = this.searchKeyword.trim();
+    return TRUNCATION_CASES.filter((caseEntry: TruncationCaseEntry) => {
+      if (this.activeTag !== TRUNCATION_ALL_TAG && caseEntry.caseTag !== this.activeTag) {
+        return false;
+      }
+      if (keyword.length === 0) {
+        return true;
+      }
+      return caseEntry.caseTitle.indexOf(keyword) >= 0 || caseEntry.caseTag.indexOf(keyword) >= 0;
+    });
+  }
+
+  /** 有任一筛选条件生效 */
+  private isFiltering(): boolean {
+    return this.activeTag !== TRUNCATION_ALL_TAG || this.searchKeyword.trim().length > 0;
+  }
+
+  /** 右上角的计数：有筛选时显示「命中 / 总数」 */
+  private caseCountLabel(): string {
+    if (!this.isFiltering()) {
+      return TRUNCATION_CASE_COUNT.toString() + ' 个案例';
+    }
+    return this.visibleCases().length.toString() + ' / ' + TRUNCATION_CASE_COUNT.toString() + ' 个案例';
+  }
+
+  /** 列表为空时的提示文案 */
+  private emptyHintLabel(): string {
+    if (this.searchKeyword.trim().length > 0) {
+      return '没有匹配「' + this.searchKeyword.trim() + '」的案例';
+    }
+    return '该标签下暂无案例';
+  }
+
+  private resetListScroll(): void {
+    this.listScroller.scrollTo({ xOffset: 0, yOffset: 0 });
+  }
+
+  /**
+   * 筛选项的 key 带上选中态：
+   * ForEach 在 key 不变时会复用旧节点，把选中态编进 key 才能保证切换时重绘。
+   */
+  private tagChipKey(chip: TruncationTagChip): string {
+    return chip.tagLabel + (this.activeTag === chip.tagLabel ? '#on' : '#off');
+  }
+
+  @Builder
+  tagChip(chip: TruncationTagChip) {
+    Row({ space: 5 }) {
+      Text(chip.tagLabel)
+        .fontSize(12)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(this.activeTag === chip.tagLabel ? '#FBF9F4' : '#14161A')
+
+      Text(chip.tagCount.toString())
+        .fontSize(10)
+        .fontColor(this.activeTag === chip.tagLabel ? '#D8D2C4' : '#8A857A')
+    }
+    .height(30)
+    .padding({ left: 12, right: 12 })
+    .backgroundColor(this.activeTag === chip.tagLabel ? '#14161A' : '#FFFFFF')
+    .border({
+      width: 1,
+      color: this.activeTag === chip.tagLabel ? '#14161A' : '#E6E0D4'
+    })
+    .borderRadius(15)
+    .alignItems(VerticalAlign.Center)
+    .onClick(() => {
+      if (this.activeTag === chip.tagLabel) {
+        return;
+      }
+      this.activeTag = chip.tagLabel;
+      this.resetListScroll();
+    })
+  }
+
+  /** 搜索框：按标题或标签搜索 */
+  @Builder
+  searchField() {
+    Row() {
+      SymbolGlyph($r('sys.symbol.magnifyingglass'))
+        .fontSize(15)
+        .fontColor(['#8A857A'])
+
+      TextInput({ text: this.searchKeyword, placeholder: '搜索案例标题或标签' })
+        .placeholderFont({ size: 13 })
+        .placeholderColor('#A39D90')
+        .fontSize(13)
+        .fontColor('#14161A')
+        .backgroundColor(Color.Transparent)
+        .padding({ left: 6, right: 6 })
+        .height(36)
+        .layoutWeight(1)
+        .enterKeyType(EnterKeyType.Search)
+        .onChange((value: string) => {
+          this.searchKeyword = value;
+          this.resetListScroll();
+        })
+
+      if (this.searchKeyword.length > 0) {
+        Text('✕')
+          .fontSize(12)
+          .fontColor('#8A857A')
+          .width(24)
+          .height(24)
+          .textAlign(TextAlign.Center)
+          .onClick(() => {
+            this.searchKeyword = '';
+            this.resetListScroll();
+          })
+      }
+    }
+    .width('100%')
+    .height(38)
+    .padding({ left: 12, right: 8 })
+    .backgroundColor('#FFFFFF')
+    .border({ width: 1, color: '#E6E0D4' })
+    .borderRadius(10)
+    .alignItems(VerticalAlign.Center)
+    .margin({ top: 12 })
+  }
+
+  /** 标签筛选栏，标签多时可横向滑动 */
+  @Builder
+  tagFilterBar() {
+    Scroll() {
+      Row({ space: 8 }) {
+        ForEach(TRUNCATION_TAG_CHIPS, (chip: TruncationTagChip) => {
+          this.tagChip(chip)
+        }, (chip: TruncationTagChip) => this.tagChipKey(chip))
+      }
+      .height(34)
+    }
+    .width('100%')
+    .scrollable(ScrollDirection.Horizontal)
+    .scrollBar(BarState.Off)
+    .align(Alignment.Start)
+    .margin({ top: 10 })
+  }
 
   @Builder
   caseCard(caseEntry: TruncationCaseEntry) {
@@ -211,7 +417,7 @@ export struct TruncationCaseListPage {
 
           Blank()
 
-          Text(TRUNCATION_CASE_COUNT.toString() + ' 个案例')
+          Text(this.caseCountLabel())
             .fontSize(11)
             .fontColor('#8A857A')
         }
@@ -219,21 +425,29 @@ export struct TruncationCaseListPage {
         .height(54)
         .alignItems(VerticalAlign.Center)
 
-        Text('文字 / 内容被父容器裁切、显示不全')
-          .fontSize(12)
-          .fontColor('#7A756B')
-          .width('100%')
+        this.searchField()
+
+        this.tagFilterBar()
 
         Divider()
           .strokeWidth(1)
           .color('#DAD4C6')
           .margin({ top: 14, bottom: 16 })
 
-        Scroll() {
+        Scroll(this.listScroller) {
           Column() {
-            ForEach(TRUNCATION_CASES, (caseEntry: TruncationCaseEntry) => {
+            ForEach(this.visibleCases(), (caseEntry: TruncationCaseEntry) => {
               this.caseCard(caseEntry)
             }, (caseEntry: TruncationCaseEntry) => caseEntry.caseRoute)
+
+            if (this.visibleCases().length === 0) {
+              Text(this.emptyHintLabel())
+                .fontSize(12)
+                .fontColor('#8A857A')
+                .width('100%')
+                .textAlign(TextAlign.Center)
+                .margin({ top: 24 })
+            }
           }
           .width('100%')
         }
