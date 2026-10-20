@@ -18,6 +18,13 @@ rem      none  不切屏态/不旋转, 按当前状态截 1 张 旧版行为
 rem
 rem    设备SN      可选, 多设备连接时用于指定目标
 rem
+rem  设备选择:
+rem    只连接 1 台设备  直接使用该设备
+rem    连接多台设备     列出设备清单, 提示输入序号或直接输入 SN 选择
+rem                     回车默认选 1; 也可用第 3 个参数跳过交互
+rem    后续所有 hdc 命令均带 -t <设备SN> 执行
+rem    非交互环境(stdin 被重定向)下读不到输入时, 自动按序号 1 处理
+rem
 rem  文件名形如: 前缀_状态_方向_时间戳.jpeg
 rem    状态: f = F态(折叠) / m = M态(展开) / current
 rem    方向: ori  = 原始方向, 对应 hidumper -a -motion,0
@@ -86,25 +93,70 @@ if not defined TS (
     exit /b 1
 )
 
-rem ---------- 2. 确定目标设备 ----------
-"%HDC_CMD%" list targets > "%TMP_OUT%" 2>nul
-set "DEVICE="
-set "DEVC=0"
-for /f "usebackq delims=" %%d in ("%TMP_OUT%") do (
-    set "LN=%%d"
-    if not "!LN!"=="" if /i not "!LN!"=="[Empty]" (
-        set "DEVICE=!LN!"
-        set /a DEVC+=1
-    )
-)
-if defined WANT_SN (
-    set "DEVICE=%WANT_SN%"
-    set "DEVC=1"
-)
-if not defined DEVICE (
+rem ---------- 2. 枚举设备并确定目标 ----------
+call :list_devices
+if !DEVC! EQU 0 (
     echo [ERROR] 未检测到设备, 请连接设备后执行 "hdc list targets" 确认。
     exit /b 1
 )
+
+rem 2.1 命令行第 3 个参数优先
+if defined WANT_SN (
+    call :sn_index_of "%WANT_SN%"
+    if !SN_INDEX! EQU 0 (
+        echo [ERROR] 指定的设备 "%WANT_SN%" 不在已连接设备列表中:
+        call :print_device_list
+        exit /b 1
+    )
+    set "DEVICE=%WANT_SN%"
+    goto :device_ready
+)
+
+rem 2.2 只有一台设备, 直接使用
+if !DEVC! EQU 1 (
+    set "DEVICE=!DEV_1!"
+    goto :device_ready
+)
+
+rem 2.3 多台设备, 交互选择
+echo.
+echo [INFO] 检测到 !DEVC! 台设备, 请选择目标设备:
+call :print_device_list
+echo.
+:pick_device
+set "SEL="
+set /p "SEL=请输入序号 [1-!DEVC!] (回车默认 1, 也可直接输入 SN): "
+rem 去掉首尾空格, 空输入按默认 1 处理
+call :trim_var SEL
+if not defined SEL set "SEL=1"
+
+rem 判断输入是纯数字还是 SN: 含非数字字符即视为 SN
+set "SEL_NONNUM="
+for /f "delims=0123456789" %%a in ("!SEL!") do set "SEL_NONNUM=1"
+
+if defined SEL_NONNUM (
+    call :sn_index_of "!SEL!"
+    if !SN_INDEX! EQU 0 (
+        echo [WARN] "!SEL!" 既不是序号也不在设备列表中, 请重新输入。
+        echo.
+        goto :pick_device
+    )
+    set "DEVICE=!SEL!"
+) else (
+    if !SEL! LSS 1 goto :pick_invalid
+    if !SEL! GTR !DEVC! goto :pick_invalid
+    for %%j in (!SEL!) do set "DEVICE=!DEV_%%j!"
+    rem 形如 "02" 的前导零会取不到设备, 按非法序号处理
+    if not defined DEVICE goto :pick_invalid
+)
+goto :device_ready
+
+:pick_invalid
+echo [WARN] 序号无效, 请输入 1 到 !DEVC! 之间的数字。
+echo.
+goto :pick_device
+
+:device_ready
 
 rem ---------- 3. 打印运行信息 ----------
 echo.
@@ -115,12 +167,6 @@ echo [INFO] 截图模式  : %MODE%
 echo [INFO] 目标设备  : %DEVICE%
 echo [INFO] hdc       : %HDC_CMD%
 echo ============================================================
-
-if !DEVC! GTR 1 if not defined WANT_SN (
-    echo [WARN] 检测到 !DEVC! 台设备, 默认使用最后一台: !DEVICE!
-    echo [WARN] 如需指定设备, 请用第 3 个参数传入设备 SN。
-    echo.
-)
 
 rem ---------- 4. 探测折叠屏并读取当前屏态 ----------
 echo.
@@ -177,7 +223,7 @@ goto :finish
 
 :finish
 rem ---------- 7. 清理设备端本次生成的临时文件 ----------
-"%HDC_CMD%" -t %DEVICE% shell "rm -f %REMOTE_DIR%/%PREFIX%_*_%TS%.jpeg %REMOTE_DIR%/%PREFIX%_*_%TS%.png" >nul 2>nul
+"%HDC_CMD%" -t "%DEVICE%" shell "rm -f %REMOTE_DIR%/%PREFIX%_*_%TS%.jpeg %REMOTE_DIR%/%PREFIX%_*_%TS%.png" >nul 2>nul
 if exist "%TMP_OUT%" del /q "%TMP_OUT%" >nul 2>nul
 
 echo.
@@ -197,10 +243,58 @@ rem ============================================================
 rem  子过程
 rem ============================================================
 
+rem ---------- 枚举已连接设备到 DEV_1..DEV_N, 数量放 DEVC ----------
+:list_devices
+"%HDC_CMD%" list targets > "%TMP_OUT%" 2>nul
+set "DEVC=0"
+for /f "usebackq delims=" %%d in ("%TMP_OUT%") do (
+    set "LN=%%d"
+    set "LN=!LN: =!"
+    if not "!LN!"=="" if /i not "!LN!"=="[Empty]" (
+        set /a DEVC+=1
+        set "DEV_!DEVC!=!LN!"
+    )
+)
+exit /b 0
+
+rem ---------- 查 SN 在设备列表中的序号: %1=SN, 结果放 SN_INDEX(0 表示未找到) ----------
+:sn_index_of
+set "SN_INDEX=0"
+for /l %%i in (1,1,!DEVC!) do (
+    if /i "!DEV_%%i!"=="%~1" set "SN_INDEX=%%i"
+)
+exit /b 0
+
+rem ---------- 去掉变量首尾空格: %1=变量名 ----------
+:trim_var
+setlocal enabledelayedexpansion
+set "_tv=!%~1!"
+:trim_var_loop
+if "!_tv:~0,1!"==" " (
+    set "_tv=!_tv:~1!"
+    goto :trim_var_loop
+)
+if "!_tv:~-1!"==" " (
+    set "_tv=!_tv:~0,-1!"
+    goto :trim_var_loop
+)
+endlocal & set "%~1=%_tv%"
+exit /b 0
+
+rem ---------- 打印设备清单 ----------
+:print_device_list
+for /l %%i in (1,1,!DEVC!) do (
+    set "DSN=!DEV_%%i!"
+    set "DTYPE=USB"
+    if not "!DSN::=!"=="!DSN!" set "DTYPE=TCP/模拟器"
+    echo        %%i. !DSN!  -  !DTYPE!
+)
+exit /b 0
+
 rem ---------- 读取折叠屏状态: hidumper -s 4607 -a -a ----------
 rem  输出 Rotation / FoldStatus 等字段, 并据此判断是否折叠屏
 :show_fold_status
-"%HDC_CMD%" -t %DEVICE% shell "hidumper -s %FOLD_SVC% -a -a" > "%TMP_OUT%" 2>nul
+"%HDC_CMD%" -t "%DEVICE%" shell "hidumper -s %FOLD_SVC% -a -a" > "%TMP_OUT%" 2>nul
 set "FOLD_OK=0"
 powershell -NoProfile -Command "$m = Select-String -LiteralPath '%TMP_OUT%' -Pattern '^\s*\S*(Rotation|Fold)\S*\s*:'; if ($m) { $m.Line; exit 0 } else { exit 1 }"
 if errorlevel 1 (
@@ -214,14 +308,14 @@ rem ---------- 打开折叠屏调试开关 ----------
 :enable_fold_debug
 echo.
 echo [INFO] 打开折叠屏调试开关: param set dms.hidumper.supportdebug true
-"%HDC_CMD%" -t %DEVICE% shell "param set dms.hidumper.supportdebug true" >nul 2>nul
+"%HDC_CMD%" -t "%DEVICE%" shell "param set dms.hidumper.supportdebug true" >nul 2>nul
 if errorlevel 1 echo [WARN] 打开调试开关失败, 若屏态切换无效请检查设备权限。
 exit /b 0
 
 rem ---------- 唤醒设备 ----------
 :wakeup
 echo [INFO] 唤醒设备: power-shell wakeup
-"%HDC_CMD%" -t %DEVICE% shell "power-shell wakeup" >nul 2>nul
+"%HDC_CMD%" -t "%DEVICE%" shell "power-shell wakeup" >nul 2>nul
 call :wait 1
 exit /b 0
 
@@ -254,7 +348,7 @@ if /i "%~1"=="F" (
 )
 echo.
 echo [INFO] 切换屏态: !FS_NAME!  hidumper -s %FOLD_SVC% -a !FS_ARG!
-"%HDC_CMD%" -t %DEVICE% shell "hidumper -s %FOLD_SVC% -a !FS_ARG!" >nul 2>nul
+"%HDC_CMD%" -t "%DEVICE%" shell "hidumper -s %FOLD_SVC% -a !FS_ARG!" >nul 2>nul
 if errorlevel 1 echo [WARN] 屏态切换命令返回非 0, 设备可能不支持该命令。
 call :wait %WAIT_FOLD%
 call :show_fold_status
@@ -271,7 +365,7 @@ if "%~1"=="0" (
 )
 echo.
 echo [INFO] 旋转屏幕: !ROT_NAME!  hidumper -s %FOLD_SVC% -a -motion,!ROT_ARG!
-"%HDC_CMD%" -t %DEVICE% shell "hidumper -s %FOLD_SVC% -a -motion,!ROT_ARG!" >nul 2>nul
+"%HDC_CMD%" -t "%DEVICE%" shell "hidumper -s %FOLD_SVC% -a -motion,!ROT_ARG!" >nul 2>nul
 if errorlevel 1 echo [WARN] 旋转命令返回非 0, 设备可能不支持 motion 控制。
 call :wait %WAIT_ROTATE%
 exit /b 0
@@ -287,13 +381,13 @@ set "LOCAL_FILE=%LOCAL_DIR%%PREFIX%_%SHOT_TAG%_%TS%.jpeg"
 echo.
 echo [!SHOT_COUNT!] 截图: !SHOT_DESC!
 echo       设备路径: !REMOTE_FILE!
-"%HDC_CMD%" -t %DEVICE% shell "mkdir -p %REMOTE_DIR%" >nul 2>nul
-"%HDC_CMD%" -t %DEVICE% shell "snapshot_display -f !REMOTE_FILE!" >nul 2>nul
+"%HDC_CMD%" -t "%DEVICE%" shell "mkdir -p %REMOTE_DIR%" >nul 2>nul
+"%HDC_CMD%" -t "%DEVICE%" shell "snapshot_display -f !REMOTE_FILE!" >nul 2>nul
 if errorlevel 1 (
     echo [WARN] snapshot_display 失败, 改用 uitest screenCap ...
-    "%HDC_CMD%" -t %DEVICE% shell "uitest screenCap -p !REMOTE_FILE!" >nul 2>nul
+    "%HDC_CMD%" -t "%DEVICE%" shell "uitest screenCap -p !REMOTE_FILE!" >nul 2>nul
 )
-"%HDC_CMD%" -t %DEVICE% file recv "!REMOTE_FILE!" "!LOCAL_FILE!" >nul 2>nul
+"%HDC_CMD%" -t "%DEVICE%" file recv "!REMOTE_FILE!" "!LOCAL_FILE!" >nul 2>nul
 if not exist "!LOCAL_FILE!" (
     echo [ERROR] 截图失败, 未生成本地文件: !LOCAL_FILE!
     set "FAILED=1"
