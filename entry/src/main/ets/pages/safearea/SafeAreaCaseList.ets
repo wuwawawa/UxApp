@@ -23,6 +23,7 @@
  */
 
 import { FlightFilterStatusBarPage } from './FlightFilterStatusBar';
+import { MailAddressStatusBarPage } from './MailAddressStatusBar';
 import { ProfileHeaderStatusBarPage } from './ProfilePhoneStatusBar';
 
 interface SafeAreaCaseEntry {
@@ -49,6 +50,11 @@ function profileHeaderCasePage(pageStack: NavPathStack) {
   ProfileHeaderStatusBarPage({ pageStack: pageStack })
 }
 
+@Builder
+function mailAddressCasePage(pageStack: NavPathStack) {
+  MailAddressStatusBarPage({ pageStack: pageStack })
+}
+
 /** 「未避让安全区」分类下的全部案例，新增案例时在这里追加一条 */
 const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
   {
@@ -66,6 +72,14 @@ const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
     caseIcon: '号',
     caseSummary: '双屏横屏时手机号、消息/设置压住状态栏的时间与电量图标',
     casePage: wrapBuilder(profileHeaderCasePage)
+  },
+  {
+    caseRoute: 'safearea/mail-address-statusbar',
+    caseTitle: '邮寄地址页拉起键盘压状态栏',
+    caseTag: '状态栏',
+    caseIcon: '址',
+    caseSummary: '点「邮编号码」后标题栏滑出屏幕，表单整体上移叠在状态栏时间、电量上',
+    casePage: wrapBuilder(mailAddressCasePage)
   }
 ];
 
