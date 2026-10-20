@@ -47,7 +47,7 @@ const BIG_CONTENT_CASES: BigContentCaseEntry[] = [
   {
     caseRoute: 'bigcontent/pharmacy-big-image',
     caseTitle: '看病买药商品图',
-    caseTag: '双屏态横屏',
+    caseTag: '大图',
     caseIcon: '图',
     caseSummary: '横屏下一屏只剩一行商品，商品图占满屏幕',
     casePage: wrapBuilder(pharmacyProductBigImageCasePage)
