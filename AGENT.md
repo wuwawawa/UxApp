@@ -190,6 +190,8 @@ hdc -t <serial> shell "hidumper -s DisplayManagerService -a '-a'"              #
    `onAreaChange` 更新 `winWidthVp` / `winHeightVp`。
 3. **注册路由**：在对应分类页文件的 `XXX_CASES` 里追加一条（`caseRoute` / `caseTitle` /
    `caseTag` / `caseIcon` / `caseSummary` / `casePage`），并补一个 `@Builder`。
+   分类页的搜索框与标签筛选栏（「全部」+ 各 `caseTag` 去重、带案例数）都是自动从这张表生成的，
+   新增案例只需填好 `caseTag`，不用单独改筛选栏。
 4. **同步数量**：分类的 `categoryCaseCount` 用导出的 `XXX_CASE_COUNT`，首页卡片文案只写现象。
 5. **三态自测**：在模拟器上切单屏 / 双屏竖屏 / 双屏横屏各截一张，确认该案例的目标屏态稳定复现；
    另外两态按复刻对象核对，以原 App 截图的实际表现为准（不要求「一定完全正常」）。
