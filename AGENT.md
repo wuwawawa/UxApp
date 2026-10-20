@@ -111,8 +111,7 @@ UxApp/
 - 模拟器一般常驻，**日常验证都走模拟器**（能脚本切折叠态、旋转、截图）。
 - 设备名 / 序列号随时会变，不要写死：每次用 `devecocli device list` 现查，再显式传参 ——
   `ui` / `log` / `run` 用 `--device <name|serial>`，`emulator` 子命令用 `--target <name|serial>`。
-- 不指定目标时，只要当前连接了多台设备（例如真机也插着）就会报 `Multiple devices found`。
-- 真机只做最终人工复核：手动折叠 + 重力旋转，没有对应的脚本命令。
+- 不指定目标时，只要当前连接了多台设备就会报 `Multiple devices found`。
 
 ---
 
@@ -222,7 +221,7 @@ hdc -t <serial> shell "hidumper -s DisplayManagerService -a '-a'"              #
 
 ## 六、已知坑
 
-1. **多设备必须选目标**：同时连着真机和模拟器时，`ui` / `log` / `run` 不带 `--device` 会报
+1. **多设备必须选目标**：连接了多台设备时，`ui` / `log` / `run` 不带 `--device` 会报
    `Multiple devices found`；`emulator` 子命令的 `--target` 是必填项。
 2. **`rotate` 不一定立即生效**：命令返回 success 但方向可能没变（会被合并 / 延后到下一次窗口变化），
    必须截图后按图片尺寸判断当前方向；不生效就再发一次，或改用 `rotate right`。切换页面 / 重装
