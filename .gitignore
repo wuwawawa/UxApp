@@ -4,6 +4,7 @@
 /.idea
 **/build
 /repro/
+/shots/
 /.hvigor
 .cxx
 /.clangd
