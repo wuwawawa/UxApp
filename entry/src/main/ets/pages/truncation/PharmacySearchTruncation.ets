@@ -21,22 +21,14 @@
  * 下面是「24h服务」九宫格、「秒问医生」、「新人专享特惠」、商品横排、美团补贴广告位
  * 以及底部 TabBar。
  *
- * 头部与卡片尺寸都按单屏态截图（459.6×672vp，密度 2.75）量出的设计值摆放，
- * 三个屏态下完全一致：
+ * 头部与卡片尺寸都按单屏态截图（459.6×672vp，密度 2.75）量出的设计值摆放：
  *   单屏态        459.6×672vp  —— 正常
  *   双屏态竖屏    664.7×939.6vp —— 正常
  *   双屏态横屏    939.6×664.7vp —— 搜索框上面一半被裁掉
  *
  * 问题表现（双屏态横屏）：
- *   搜索区容器高度被压成「半个搜索框 + 频道栏」，容器开了 clip，
- *   搜索框内容仍按完整高度摆放，于是搜索框上半截被上沿切掉——
  *   贴着「看病买药」标题行下沿露出白色，占位文字、相机图标、「搜索」
  *   都只剩下半截，看起来像是搜索框被上面的黄色标题区压掉了一半。
- *
- * 根因：旧版本为了在横屏矮窗口里给下方卡片腾高度，直接把「搜索框 + 频道栏」
- * 整体上提了搜索框高度的一半（PHARMACY_COMPACT_LIFT），容器高度同步减掉同样的值，
- * 但搜索框自身的高度、字号、内边距都没有跟着缩，多出来的半个搜索框就落在裁剪区外。
- * 竖屏（单屏 / 双屏态竖屏）窗口高度够用，不走这条横屏分支，所以看不到截断。
  */
 
 import { window } from '@kit.ArkUI';
@@ -57,10 +49,7 @@ const PHARMACY_SEARCH_SIDE_INSET: number = 8.5;
 /** 频道栏选中态胶囊高度（vp） */
 const PHARMACY_CHANNEL_PILL_HEIGHT: number = 27;
 
-/**
- * 横屏紧凑态的上提量 = 搜索框高度的一半。
- * 上提多少，搜索区容器就少给多少，搜索框正好被裁掉上面一半。
- */
+/** 横屏紧凑态下搜索区的上提量：搜索框高度的一半 */
 const PHARMACY_COMPACT_LIFT: number = PHARMACY_SEARCH_BAR_HEIGHT / 2;
 
 /** 九宫格每列宽度占窗口宽度的比例：6 列合计 105%，第 6 列露出一半（与原图一致） */
@@ -201,10 +190,7 @@ export struct PharmacySearchTruncationPage {
     return 0;
   }
 
-  /**
-   * 搜索区（搜索框 + 频道栏）容器高度。
-   * 横屏时少给了 PHARMACY_COMPACT_LIFT，正好是搜索框被裁掉的那半个。
-   */
+  /** 搜索区（搜索框 + 频道栏）容器高度 */
   private searchZoneHeightVp(): number {
     return PHARMACY_SEARCH_BAR_HEIGHT + PHARMACY_CHANNEL_BAR_HEIGHT - this.searchZoneLiftVp();
   }

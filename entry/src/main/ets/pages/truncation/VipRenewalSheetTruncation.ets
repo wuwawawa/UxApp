@@ -16,8 +16,7 @@
 /**
  * 反例：截断 / 会员续费弹层截断
  *
- * 复刻盒马 X 88VIP 续费页：底部弹层的字号、间距、卡片高度全部按「窗口宽度 / 361vp」
- * 等比放大（H5 rem 适配的典型写法），弹层整体贴底摆放，自身高度不做窗口高度收敛。
+ * 复刻盒马 X 88VIP 续费页：底部弹层贴底摆放。
  *
  * 当前 Pura X Max 上：
  * 单屏态（459.6vp 宽）弹层约 384vp 高，完整贴在页面底部；
@@ -84,7 +83,7 @@ export struct VipRenewalSheetTruncationPage {
     });
   }
 
-  /** 弹层内容随窗口宽度等比放大，越宽的窗口弹层越高 */
+  /** 弹层内容缩放比 */
   private uiScale(): number {
     const widthRatio: number = this.winWidthVp / VIP_RENEWAL_REFERENCE_WIDTH;
     return widthRatio < 1 ? 1 : widthRatio;

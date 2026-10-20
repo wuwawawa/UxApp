@@ -329,7 +329,7 @@ export struct PharmacyProductBigImagePage {
   @Builder
   productCard(product: BigProductItem) {
     Column() {
-      // 商品图：宽度铺满卡片（= 列宽），高度按列宽取正方形后被 0.6 屏高截断
+      // 商品图：铺满卡片宽度
       Image(product.productImage)
         .width('100%')
         .height(this.productImageHeightVp())

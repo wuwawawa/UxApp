@@ -16,9 +16,8 @@
 /**
  * 反例：截断 / 盒马「做任务 攒盒花」弹层截断
  *
- * 复刻盒马 App 首页的签到任务弹层：整页按窗口宽度做等比缩放（H5 rem 适配），
- * 弹层宽度撑满窗口，高度 = 窗口宽度 × 0.742，贴底摆放在 84vp 高的底部 TabBar 之上，
- * 自身高度不随窗口高度收敛，也不可滚动。
+ * 复刻盒马 App 首页的签到任务弹层：弹层宽度撑满窗口，贴底摆放在 84vp 高的底部 TabBar 之上，
+ * 自身不可滚动。
  *
  * 当前 Pura X Max 上（密度 2.75）：
  * 单屏态 459.6×672vp：弹层高 340vp，顶部在 248vp，完整可见；
@@ -95,7 +94,7 @@ export struct HemaTaskSheetTruncationPage {
     return baseVp * this.uiScale();
   }
 
-  /** 弹层高度只跟窗口宽度走，不跟窗口高度收敛 */
+  /** 弹层高度 */
   private sheetHeightVp(): number {
     return this.winWidthVp * HEMA_SHEET_HEIGHT_RATIO;
   }

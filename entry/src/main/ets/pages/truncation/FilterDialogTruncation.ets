@@ -107,7 +107,7 @@ export struct FilterDialogTruncationPage {
   });
 
   aboutToAppear(): void {
-    // 进入页面即拉起弹窗，便于直接在设备上复现裁切问题
+    // 进入页面即拉起弹窗
     setTimeout(() => {
       this.filterDialog.open();
     }, 600);

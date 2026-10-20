@@ -17,21 +17,15 @@
  * 反例：截断 / 盒马「我的」菜单截断
  *
  * 复刻盒马首页：顶部「收盒花 得美味」banner + 下方「下单返盒花」双列商品区，
- * 整页按「窗口宽度 / 459.6vp」等比放大（H5 rem 适配）；内容可上下滚动，
- * 右上角「我的」入口固定在窗口上，点开后是白色下拉菜单。
+ * 内容可上下滚动，右上角「我的」入口固定在窗口上，点开后是白色下拉菜单。
  *
- * 菜单卡片挂在「我的」按钮下方、贴右侧摆放，宽度 / 图标 / 字号 / 行高同样按
- * 宽度等比放大。菜单高度只跟窗口宽度走，不随窗口高度收敛，自身也不可滚动，
- * 底部直接由内容区（底部 TabBar 之上）硬裁切。
+ * 菜单卡片挂在「我的」按钮下方、贴右侧摆放，自身不可滚动。
  *
  * 当前 Pura X Max 上（密度 2.75）：
  * 单屏态 459.6×672vp：菜单 206vp 高、距顶 104vp，完整可见；
  * 双屏态竖屏 664.7×939.6vp：菜单底部仍在 TabBar 之上，完整可见；
  * 双屏态横屏 939.6×664.7vp：菜单顶到 212.6vp、高 421vp，TabBar 之上只剩 580.7vp，
  * 最后一项「小镇客服」正好在 TabBar 上沿被裁掉一半——图标和文字都只剩上半截。
- *
- * 真实截图里被裁掉的是整行图标，为了让问题一眼可见，这里把裁切线对准了
- * 最后一项文字的中线；上下挪动 HEMA_MENU_TOP 即可移动裁切位置。
  */
 
 import { window } from '@kit.ArkUI';
@@ -42,10 +36,7 @@ import { HemaTownScene, HemaTownTabBar, HEMA_TOWN_TAB_BAR_HEIGHT } from '../../c
 /** 缩放基准：单屏态窗口宽度（1264px / 2.75） */
 const HEMA_MENU_REFERENCE_WIDTH: number = 459.6;
 
-/**
- * 菜单卡片距内容区顶部（设计基准 vp）。
- * 双屏态横屏下第 5 行文字中心会落在 TabBar 上沿，正好被裁掉一半。
- */
+/** 菜单卡片距内容区顶部（设计基准 vp） */
 const HEMA_MENU_TOP: number = 104;
 
 /** 菜单卡片宽度（设计基准 vp） */
@@ -143,7 +134,7 @@ export struct HemaMyMenuTruncationPage {
   @State winWidthVp: number = HEMA_MENU_REFERENCE_WIDTH;
   @State winHeightVp: number = 672;
 
-  /** 进入页面就展开菜单，方便直接观察裁切 */
+  /** 进入页面就展开菜单 */
   @State menuOpen: boolean = true;
 
   private pageActive: boolean = false;

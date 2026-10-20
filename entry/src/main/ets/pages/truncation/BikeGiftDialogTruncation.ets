@@ -21,9 +21,8 @@
  * 海报下沿压着「立即购卡」按钮（按钮一半在海报内、一半露在海报外），
  * 海报下方是圆形灰色关闭按钮。
  *
- * 弹窗宽度 / 字号 / 插画全部按「窗口宽度 / 459.6vp」等比放大（H5 rem 适配），
- * 弹窗高度只由内容（海报 303vp + 按钮露出的 23vp + 间距 14vp + 关闭按钮 36vp）
- * 决定，不随窗口高度收敛；垂直居中时顶部保留最小 44vp，底部不做任何收敛。
+ * 弹窗由海报（303vp 高）、露在海报外的「立即购卡」按钮（23vp）和下方关闭按钮
+ * （间隔 14vp、36vp 见方）组成，竖直居中摆放，顶部至少保留 44vp。
  *
  * 当前 Pura X Max 上（密度 2.75）：
  * 单屏态 459.6×672vp：弹窗 377×376vp，居中完整显示；
@@ -91,7 +90,7 @@ export struct BikeGiftDialogTruncationPage {
   aboutToAppear(): void {
     this.pageActive = true;
     this.enterImmersiveMode();
-    // 进入页面即拉起弹窗，便于直接在设备上复现裁切问题
+    // 进入页面即拉起弹窗
     setTimeout(() => {
       this.giftDialogVisible = true;
     }, 800);
@@ -144,7 +143,7 @@ export struct BikeGiftDialogTruncationPage {
     return this.gs(BIKE_GIFT_DIALOG_HEIGHT);
   }
 
-  /** 居中摆放；顶部不进入状态栏，但底部不随窗口收敛 —— 横屏时下半截会移出窗口 */
+  /** 居中摆放；顶部不进入状态栏 */
   private giftDialogTopVp(): number {
     const centeredTop: number = (this.winHeightVp - this.giftDialogHeightVp()) / 2;
     return centeredTop < BIKE_GIFT_MIN_TOP ? BIKE_GIFT_MIN_TOP : centeredTop;

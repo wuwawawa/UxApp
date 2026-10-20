@@ -123,7 +123,7 @@ const HOME_CATEGORIES: HomeCategory[] = [
     categoryRoute: 'category/big-content',
     categoryIndex: '04',
     categoryTitle: '大图大字',
-    categoryDesc: '商品图跟着列宽等比放大，横屏一屏只剩一行',
+    categoryDesc: '横屏下商品图占满屏幕，一屏只剩一行',
     categoryCaseCount: BIG_CONTENT_CASE_COUNT,
     categoryPage: BIG_CONTENT_CATEGORY_PAGE
   }

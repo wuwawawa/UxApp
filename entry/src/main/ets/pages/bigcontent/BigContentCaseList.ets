@@ -49,7 +49,7 @@ const BIG_CONTENT_CASES: BigContentCaseEntry[] = [
     caseTitle: '看病买药商品图',
     caseTag: '双屏态横屏',
     caseIcon: '图',
-    caseSummary: '两列商品卡跟着窗口宽度放大，横屏一屏只剩一行商品',
+    caseSummary: '横屏下一屏只剩一行商品，商品图占满屏幕',
     casePage: wrapBuilder(pharmacyProductBigImageCasePage)
   }
 ];
@@ -166,7 +166,7 @@ export struct BigContentCaseListPage {
         .height(54)
         .alignItems(VerticalAlign.Center)
 
-        Text('图片、字号跟着窗口等比放大，横屏下商品图占满屏幕')
+        Text('横屏下商品图占满屏幕，一屏只放得下一行商品')
           .fontSize(12)
           .lineHeight(18)
           .fontColor('#7A756B')

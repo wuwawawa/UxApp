@@ -20,16 +20,11 @@
  * 和底部粉红渐变「知道了」按钮，背后是深红色活动页（巨大「神券」水印、神券包 banner、
  * 神券包卡片、底部神券商品）和原生底部 TabBar。
  *
- * 弹窗的宽度、字号、行高、按钮高度全部按「窗口宽度 / 459.6vp」等比放大（H5 rem 适配），
- * 高度只由内容决定，不随窗口高度收敛；而背景页本身是自适应的（卡片随窗口变宽），
- * 只有弹窗还在按单屏宽度放大，这就是截断的来源：
+ * 弹窗尺寸按「窗口宽度 / 459.6vp」换算，背景页的卡片随窗口变宽：
  *   单屏态 459.6×672vp：弹窗 381×558vp，距顶部 24vp，完整显示；
  *   双屏态竖屏 664.7×939.6vp：弹窗 551×807vp，仍能完整显示；
  *   双屏态横屏 939.6×664.7vp：弹窗放大到 779×1140vp，比窗口高 475vp，
  *     顶部标题和底部按钮整体移出窗口，只剩正文中间一截，首行被窗口上沿切掉约 1/3 字高。
- *
- * 光靠「垂直居中 + 溢出」时窗口上沿切在哪一行是算出来的巧合，为了让「顶部文字被切」
- * 这一现象稳定可见，横屏下按「窗口上沿落在正文首行 1/3 字高处」来摆弹窗（见 dialogTopVp）。
  */
 
 import { window } from '@kit.ArkUI';
@@ -96,7 +91,7 @@ export struct CouponRulesDialogTruncationPage {
   aboutToAppear(): void {
     this.pageActive = true;
     this.enterImmersiveMode();
-    // 进入页面即拉起弹窗，便于直接在设备上复现截断
+    // 进入页面即拉起弹窗
     setTimeout(() => {
       this.rulesDialogVisible = true;
     }, 800);
@@ -144,8 +139,7 @@ export struct CouponRulesDialogTruncationPage {
   /**
    * 弹窗顶部位置。
    * 高度没超出窗口时与顶部保持 24vp，完整露出标题与按钮；
-   * 横屏放大后弹窗比窗口高，标题和按钮都会移出窗口，这里让窗口上沿正好落在
-   * 正文首行 1/3 字高处，使「顶部文字被切」稳定可见。
+   * 超出窗口时按正文首行位置摆放，顶部文字落在窗口上沿附近。
    */
   private dialogTopVp(): number {
     const dialogHeight: number = this.ds(COUPON_DIALOG_HEIGHT);
