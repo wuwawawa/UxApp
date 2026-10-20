@@ -22,17 +22,24 @@ import { CouponRulesDialogTruncationPage } from './truncation/CouponRulesDialogT
 
 /**
  * 反例目录首页。
- * 新增反例页面时：
- *   1. 在 pages/ 下新建页面组件（建议 NavDestination 作为根节点）；
- *   2. 在 CASE_CATALOG 里给对应分类追加一条 CaseEntry；
- *   3. 在 caseDestination 里补一个 routeName 分支。
+ *
+ * 案例的「列表项 + 路由目标」统一收敛在 CASE_CATALOG 里：每条 CaseEntry 自带
+ * caseRoute、标题、图标和页面构建函数，新增案例只改这一处数据，不再维护
+ * route -> 页面 的 if/else 分发。
+ *
+ * 新增案例的步骤：
+ *   1. 在 pages/ 下新建页面组件（NavDestination 作为根节点，参数 pageStack: NavPathStack）；
+ *   2. 在文件末尾的「案例页面构建函数」区补一个全局 @Builder，内部实例化该页面；
+ *   3. 在 CASE_CATALOG 里追加一条 CaseEntry，caseRoute 唯一、casePage 指向刚补的 @Builder。
  */
 
 interface CaseEntry {
   caseRoute: string;
   caseTitle: string;
-  /** 复现该问题的具体机型 */
-  caseTag: string;
+  /** 卡片左侧的单字图标 */
+  caseIcon: string;
+  /** 该案例的页面构建函数，按 caseRoute 查找后直接构建 */
+  casePage: WrappedBuilder<[NavPathStack]>;
 }
 
 interface CaseCategory {
@@ -40,6 +47,68 @@ interface CaseCategory {
   categoryHint: string;
   categoryCases: CaseEntry[];
 }
+
+/** 案例页面构建函数：统一只传入导航栈 */
+@Builder
+function filterDialogCasePage(pageStack: NavPathStack) {
+  FilterDialogTruncationPage({ pageStack: pageStack })
+}
+
+@Builder
+function vipRenewalCasePage(pageStack: NavPathStack) {
+  VipRenewalSheetTruncationPage({ pageStack: pageStack })
+}
+
+@Builder
+function hemaTaskSheetCasePage(pageStack: NavPathStack) {
+  HemaTaskSheetTruncationPage({ pageStack: pageStack })
+}
+
+@Builder
+function hemaMyMenuCasePage(pageStack: NavPathStack) {
+  HemaMyMenuTruncationPage({ pageStack: pageStack })
+}
+
+@Builder
+function bikeGiftCasePage(pageStack: NavPathStack) {
+  BikeGiftDialogTruncationPage({ pageStack: pageStack })
+}
+
+@Builder
+function couponRulesCasePage(pageStack: NavPathStack) {
+  CouponRulesDialogTruncationPage({ pageStack: pageStack })
+}
+
+/** 路由找不到对应案例时的兜底页面，避免白屏 */
+@Builder
+function caseNotFoundPage(pageStack: NavPathStack) {
+  NavDestination() {
+    Column({ space: 10 }) {
+      Text('案例页面不存在')
+        .fontSize(16)
+        .fontWeight(FontWeight.Medium)
+        .fontColor('#1A1D21')
+
+      Text('请检查 CASE_CATALOG 中该案例的 casePage 是否已登记')
+        .fontSize(12)
+        .fontColor('#8A8F99')
+
+      Button('返回')
+        .fontSize(14)
+        .height(36)
+        .margin({ top: 6 })
+        .onClick(() => {
+          pageStack.pop();
+        })
+    }
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Center)
+  }
+  .hideTitleBar(true)
+}
+
+const CASE_NOT_FOUND_PAGE: WrappedBuilder<[NavPathStack]> = wrapBuilder(caseNotFoundPage);
 
 const CASE_CATALOG: CaseCategory[] = [
   {
@@ -49,36 +118,53 @@ const CASE_CATALOG: CaseCategory[] = [
       {
         caseRoute: 'truncation/filter-dialog',
         caseTitle: '购票场景文字截断',
-        caseTag: 'Pura X Max'
+        caseIcon: '票',
+        casePage: wrapBuilder(filterDialogCasePage)
       },
       {
         caseRoute: 'truncation/vip-renewal-sheet',
         caseTitle: '会员续费弹层截断',
-        caseTag: 'Pura X Max'
+        caseIcon: '会',
+        casePage: wrapBuilder(vipRenewalCasePage)
       },
       {
         caseRoute: 'truncation/hema-task-sheet',
         caseTitle: '盒马签到弹层截断',
-        caseTag: 'Pura X Max'
+        caseIcon: '签',
+        casePage: wrapBuilder(hemaTaskSheetCasePage)
       },
       {
         caseRoute: 'truncation/hema-my-menu',
         caseTitle: '盒马我的菜单截断',
-        caseTag: 'Pura X Max'
+        caseIcon: '单',
+        casePage: wrapBuilder(hemaMyMenuCasePage)
       },
       {
         caseRoute: 'truncation/bike-card-gift',
         caseTitle: '美团骑行卡赠送弹窗截断',
-        caseTag: 'Pura X Max'
+        caseIcon: '骑',
+        casePage: wrapBuilder(bikeGiftCasePage)
       },
       {
         caseRoute: 'truncation/coupon-rules-dialog',
         caseTitle: '美团神券规则弹窗截断',
-        caseTag: 'Pura X Max'
+        caseIcon: '券',
+        casePage: wrapBuilder(couponRulesCasePage)
       }
     ]
   }
 ];
+
+function findCasePage(routeName: string): WrappedBuilder<[NavPathStack]> {
+  for (const category of CASE_CATALOG) {
+    for (const caseEntry of category.categoryCases) {
+      if (caseEntry.caseRoute === routeName) {
+        return caseEntry.casePage;
+      }
+    }
+  }
+  return CASE_NOT_FOUND_PAGE;
+}
 
 @Entry
 @Component
@@ -87,49 +173,29 @@ struct Index {
 
   @Builder
   caseDestination(routeName: string) {
-    if (routeName === 'truncation/filter-dialog') {
-      FilterDialogTruncationPage({ pageStack: this.navStack })
-    } else if (routeName === 'truncation/vip-renewal-sheet') {
-      VipRenewalSheetTruncationPage({ pageStack: this.navStack })
-    } else if (routeName === 'truncation/hema-task-sheet') {
-      HemaTaskSheetTruncationPage({ pageStack: this.navStack })
-    } else if (routeName === 'truncation/hema-my-menu') {
-      HemaMyMenuTruncationPage({ pageStack: this.navStack })
-    } else if (routeName === 'truncation/bike-card-gift') {
-      BikeGiftDialogTruncationPage({ pageStack: this.navStack })
-    } else if (routeName === 'truncation/coupon-rules-dialog') {
-      CouponRulesDialogTruncationPage({ pageStack: this.navStack })
-    }
+    // 路由表查找 + 动态构建，新增案例不需要再改这里
+    findCasePage(routeName).builder(this.navStack);
   }
 
   @Builder
   caseCard(caseEntry: CaseEntry) {
     Row() {
-      Text('✂')
+      Text(caseEntry.caseIcon)
         .fontSize(18)
+        .fontWeight(FontWeight.Medium)
+        .fontColor('#1B6FE3')
         .width(44)
         .height(44)
         .textAlign(TextAlign.Center)
         .backgroundColor('#EAF1FF')
         .borderRadius(12)
 
-      Row() {
-        Text(caseEntry.caseTitle)
-          .fontSize(17)
-          .fontWeight(FontWeight.Medium)
-          .fontColor('#1A1D21')
-
-        Text(caseEntry.caseTag)
-          .fontSize(11)
-          .fontColor('#1B6FE3')
-          .backgroundColor('#EAF1FF')
-          .borderRadius(4)
-          .padding({ left: 6, right: 6, top: 2, bottom: 2 })
-          .margin({ left: 8 })
-      }
-      .layoutWeight(1)
-      .alignItems(VerticalAlign.Center)
-      .margin({ left: 14 })
+      Text(caseEntry.caseTitle)
+        .fontSize(17)
+        .fontWeight(FontWeight.Medium)
+        .fontColor('#1A1D21')
+        .layoutWeight(1)
+        .margin({ left: 14 })
 
       Text('›')
         .fontSize(26)
