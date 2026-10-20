@@ -21,6 +21,11 @@ import {
   TRUNCATION_CATEGORY_PAGE,
   resolveTruncationCasePage
 } from './truncation/TruncationCaseList';
+import {
+  BIG_CONTENT_CASE_COUNT,
+  BIG_CONTENT_CATEGORY_PAGE,
+  resolveBigContentCasePage
+} from './bigcontent/BigContentCaseList';
 
 /**
  * 反例目录首页：按问题类型分类。
@@ -54,11 +59,6 @@ function safeAreaCategoryPage(pageStack: NavPathStack) {
 @Builder
 function marginCategoryPage(pageStack: NavPathStack) {
   CategoryPlaceholderPage({ pageStack: pageStack, categoryTitle: '边距过大' })
-}
-
-@Builder
-function bigContentCategoryPage(pageStack: NavPathStack) {
-  CategoryPlaceholderPage({ pageStack: pageStack, categoryTitle: '大图大字' })
 }
 
 /** 路由未登记时的兜底页，避免白屏 */
@@ -123,9 +123,9 @@ const HOME_CATEGORIES: HomeCategory[] = [
     categoryRoute: 'category/big-content',
     categoryIndex: '04',
     categoryTitle: '大图大字',
-    categoryDesc: '图片与字号随窗口等比放大，溢出屏幕',
-    categoryCaseCount: 0,
-    categoryPage: wrapBuilder(bigContentCategoryPage)
+    categoryDesc: '商品图跟着列宽等比放大，横屏一屏只剩一行',
+    categoryCaseCount: BIG_CONTENT_CASE_COUNT,
+    categoryPage: BIG_CONTENT_CATEGORY_PAGE
   }
 ];
 
@@ -139,6 +139,10 @@ function resolvePage(routeName: string): WrappedBuilder<[NavPathStack]> {
   const casePage: WrappedBuilder<[NavPathStack]> | undefined = resolveTruncationCasePage(routeName);
   if (casePage !== undefined) {
     return casePage;
+  }
+  const bigContentCasePage: WrappedBuilder<[NavPathStack]> | undefined = resolveBigContentCasePage(routeName);
+  if (bigContentCasePage !== undefined) {
+    return bigContentCasePage;
   }
   return ROUTE_NOT_FOUND_PAGE;
 }
