@@ -31,8 +31,6 @@ import { CouponRulesDialogTruncationPage } from './truncation/CouponRulesDialogT
 interface CaseEntry {
   caseRoute: string;
   caseTitle: string;
-  /** 留空则不展示。不要写结论性描述（如“被裁掉 1/3”），修复后文案会与实际不符 */
-  caseSummary: string;
   /** 复现该问题的具体机型 */
   caseTag: string;
 }
@@ -51,37 +49,31 @@ const CASE_CATALOG: CaseCategory[] = [
       {
         caseRoute: 'truncation/filter-dialog',
         caseTitle: '购票场景文字截断',
-        caseSummary: '',
         caseTag: 'Pura X Max'
       },
       {
         caseRoute: 'truncation/vip-renewal-sheet',
         caseTitle: '会员续费弹层截断',
-        caseSummary: '',
         caseTag: 'Pura X Max'
       },
       {
         caseRoute: 'truncation/hema-task-sheet',
         caseTitle: '盒马签到弹层截断',
-        caseSummary: '',
         caseTag: 'Pura X Max'
       },
       {
         caseRoute: 'truncation/hema-my-menu',
         caseTitle: '盒马我的菜单截断',
-        caseSummary: '',
         caseTag: 'Pura X Max'
       },
       {
         caseRoute: 'truncation/bike-card-gift',
         caseTitle: '美团骑行卡赠送弹窗截断',
-        caseSummary: '',
         caseTag: 'Pura X Max'
       },
       {
         caseRoute: 'truncation/coupon-rules-dialog',
         caseTitle: '美团神券规则弹窗截断',
-        caseSummary: '',
         caseTag: 'Pura X Max'
       }
     ]
@@ -121,34 +113,22 @@ struct Index {
         .backgroundColor('#EAF1FF')
         .borderRadius(12)
 
-      Column() {
-        Row() {
-          Text(caseEntry.caseTitle)
-            .fontSize(17)
-            .fontWeight(FontWeight.Medium)
-            .fontColor('#1A1D21')
+      Row() {
+        Text(caseEntry.caseTitle)
+          .fontSize(17)
+          .fontWeight(FontWeight.Medium)
+          .fontColor('#1A1D21')
 
-          Text(caseEntry.caseTag)
-            .fontSize(11)
-            .fontColor('#1B6FE3')
-            .backgroundColor('#EAF1FF')
-            .borderRadius(4)
-            .padding({ left: 6, right: 6, top: 2, bottom: 2 })
-            .margin({ left: 8 })
-        }
-
-        if (caseEntry.caseSummary.length > 0) {
-          Text(caseEntry.caseSummary)
-            .fontSize(12)
-            .fontColor('#8A8F99')
-            .lineHeight(18)
-            .maxLines(2)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .margin({ top: 6 })
-        }
+        Text(caseEntry.caseTag)
+          .fontSize(11)
+          .fontColor('#1B6FE3')
+          .backgroundColor('#EAF1FF')
+          .borderRadius(4)
+          .padding({ left: 6, right: 6, top: 2, bottom: 2 })
+          .margin({ left: 8 })
       }
-      .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
+      .alignItems(VerticalAlign.Center)
       .margin({ left: 14 })
 
       Text('›')
