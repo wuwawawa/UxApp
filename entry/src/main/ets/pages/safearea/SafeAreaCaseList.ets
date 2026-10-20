@@ -23,6 +23,7 @@
  */
 
 import { FlightFilterStatusBarPage } from './FlightFilterStatusBar';
+import { ProfileHeaderStatusBarPage } from './ProfilePhoneStatusBar';
 
 interface SafeAreaCaseEntry {
   caseRoute: string;
@@ -43,6 +44,11 @@ function flightFilterCasePage(pageStack: NavPathStack) {
   FlightFilterStatusBarPage({ pageStack: pageStack })
 }
 
+@Builder
+function profileHeaderCasePage(pageStack: NavPathStack) {
+  ProfileHeaderStatusBarPage({ pageStack: pageStack })
+}
+
 /** 「未避让安全区」分类下的全部案例，新增案例时在这里追加一条 */
 const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
   {
@@ -52,6 +58,14 @@ const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
     caseIcon: '筛',
     caseSummary: '单屏态「筛选」标题与右上角 × 只露出下半截，右侧选项被底部裁掉一行',
     casePage: wrapBuilder(flightFilterCasePage)
+  },
+  {
+    caseRoute: 'safearea/profile-header-statusbar',
+    caseTitle: '我的页手机号压状态栏',
+    caseTag: '状态栏',
+    caseIcon: '号',
+    caseSummary: '双屏横屏时手机号、消息/设置压住状态栏的时间与电量图标',
+    casePage: wrapBuilder(profileHeaderCasePage)
   }
 ];
 
