@@ -6,8 +6,8 @@
 
 - 应用包名：`com.example.helloworld`（入口 Ability：`EntryAbility`，首页 `pages/Index`）
 - 当前内容：4 个问题分类，其中「截断重叠」8 个案例、「大图大字」1 个案例，另 2 个分类待补
-- 目标设备：真机 `HUAWEI Pura X Max`（`6HQ0125A11000475`）与模拟器 `Pura X Max`
-  （`127.0.0.1:5555`），两者分辨率一致、密度均为 **2.75**
+- 验证方式：以常驻模拟器为主，设备名 / 序列号每次用 `devecocli device list` 现查，
+  命令里显式指定 `--device` / `--target`（详见第三节）
 
 ---
 
@@ -24,16 +24,15 @@
    - 「设成 0 就不会重叠」「上下挪动 `XXX` 即可移动裁切位置」这类提示；
    - 「根因：……」段落、「旧版本为什么这么写」的推导、「这就是截断的来源」的结论。
    案例页头部注释只允许写四段：**复刻对象 → 设计基准 → 三态实测数据 → 问题表现**（现象描述）。
-3. **只在目标屏态出问题**：另外两态必须完全正常，否则案例不成立。
-4. **图片必须用真图**：商品图、海报等要从截图里裁出来存成 `resources/base/media` 下的资源，
+3. **图片必须用真图**：商品图、海报等要从截图里裁出来存成 `resources/base/media` 下的资源，
    用 `Image($r('app.media.xxx'))` 铺满，**不允许**用 `Row` / 色块 / 渐变块拼一个假图。
-5. **尺寸必须量**：所有 vp 值从设备截图量出（密度 2.75，单屏态 `459.6×672vp` 为基准），
+4. **尺寸必须量**：所有 vp 值从设备截图量出（密度 2.75，单屏态 `459.6×672vp` 为基准），
    注释里写清量测来源；不允许凭感觉调一个「差不多」的值。
-6. **窗口尺寸不硬编码**：案例页用 `onAreaChange` 拿实时窗口宽高，随折叠 / 旋转即时重排；
+5. **窗口尺寸不硬编码**：案例页用 `onAreaChange` 拿实时窗口宽高，随折叠 / 旋转即时重排；
    禁止把 `459.6` / `672` 当成运行时窗口尺寸去写死布局。
-7. **首页文案只描述现象**：分类卡片、案例卡片、清单副标题都只写「看到什么」，
+6. **首页文案只描述现象**：分类卡片、案例卡片、清单副标题都只写「看到什么」，
    不写「因为什么」「怎么修」。
-8. **交付前三态实测**：改完必须在设备上切到三种屏态各截一张图确认，并跑通
+7. **交付前三态实测**：改完必须在设备上切到三种屏态各截一张图确认，并跑通
    `devecocli build` 与 `devecocli check lint`（0 error）。
 
 ---
@@ -94,17 +93,9 @@ UxApp/
 
 ---
 
-## 三、设备与三种屏态
+## 三、屏态与设备
 
-当前线上有两个目标（真机 + 模拟器），**所有 `ui` / `log` 命令必须显式指定目标**，
-否则报 `Multiple devices found`：
-
-| 目标 | 选中方式 | 说明 |
-|---|---|---|
-| 真机 `HUAWEI Pura X Max` | `--device 6HQ0125A11000475` | 最终验收；折叠靠手动、旋转跟随重力，脚本切不了 |
-| 模拟器 `Pura X Max` | `--device "Pura X Max"` / `--target "Pura X Max"` | 用于脚本化切折叠态、旋转、截图 |
-
-两者分辨率与密度完全一致（`1264×1848` 单屏 / `1828×2584` 双屏，密度 **2.75**，`vp = px / 2.75`）：
+三种屏态的分辨率与窗口尺寸（评测基准，取自 `tools/` 参考截图，密度 **2.75**，`vp = px / 2.75`）：
 
 | 屏态 | 物理分辨率 (px) | 窗口 (vp) | 触发方式（模拟器） |
 |---|---|---|---|
@@ -113,72 +104,79 @@ UxApp/
 | 双屏态横屏 | 2584×1828 | 939.6×664.7 | `fold open` + `rotate` |
 
 > 该设备的 `fold` 只接受 `open | half-open | close`（没有 `vertical-open`）；
-> 竖屏 / 横屏是**旋转**决定的，不是折叠状态决定的。真机没有对应的 `emulator fold/rotate` 命令，
-> 只能手动折叠 + 系统自动旋转。
+> 竖屏 / 横屏是**旋转**决定的，不是折叠状态决定的。
+
+### 选设备
+
+- 模拟器一般常驻，**日常验证都走模拟器**（能脚本切折叠态、旋转、截图）。
+- 设备名 / 序列号随时会变，不要写死：每次用 `devecocli device list` 现查，再显式传参 ——
+  `ui` / `log` / `run` 用 `--device <name|serial>`，`emulator` 子命令用 `--target <name|serial>`。
+- 不指定目标时，只要当前连接了多台设备（例如真机也插着）就会报 `Multiple devices found`。
+- 真机只做最终人工复核：手动折叠 + 重力旋转，没有对应的脚本命令。
 
 ---
 
 ## 四、常用命令
 
-所有命令在工程根目录执行。当前真机与模拟器同时在线，**每条命令都要指定目标**：
-`ui` / `log` / `run` 用 `--device "Pura X Max"`（模拟器）或 `--device 6HQ0125A11000475`（真机），
-`emulator` 子命令用 `--target "Pura X Max"`。不带参数会直接报 `Multiple devices found`。
+所有命令在工程根目录执行。下文 `<dev>` 用 `devecocli device list` 查到的设备名 / 序列号替换
+（名字里带空格要加引号）；模拟器常驻，日常验证都用它。`ui` / `log` / `run` 传 `--device "<dev>"`，
+`emulator` 子命令传 `--target "<dev>"`。
 
 ### 构建 / 部署
 
 ```powershell
-devecocli build                              # 编译打包（debug）
-devecocli build clean                        # 清理产物
-devecocli run --device "Pura X Max"          # 构建 + 安装 + 拉起（推荐）
-devecocli run --skip-build --device "Pura X Max"   # 只安装已构建产物（改完代码需先 build）
-devecocli run --uninstall --device "Pura X Max"    # 签名不一致时先卸载
-hdc -t 127.0.0.1:5555 shell aa force-stop com.example.helloworld   # 冷启前杀进程
+devecocli build                                        # 编译打包（debug）
+devecocli build clean                                  # 清理产物
+devecocli run --device "<dev>"                         # 构建 + 安装 + 拉起（推荐）
+devecocli run --skip-build --device "<dev>"            # 只安装已构建产物（改完代码需先 build）
+devecocli run --uninstall --device "<dev>"             # 签名不一致时先卸载
+hdc -t <serial> shell aa force-stop com.example.helloworld   # 冷启前杀进程
 ```
 
 ### 静态检查 / 日志
 
 ```powershell
-devecocli check lint                         # 要求 0 error（warning 允许）
-devecocli log --device "Pura X Max" --level E --tail 200
-devecocli log --crash --bundle-name com.example.helloworld
+devecocli check lint                                   # 要求 0 error（warning 允许）
+devecocli log --device "<dev>" --level E --tail 200
+devecocli log --device "<dev>" --crash --bundle-name com.example.helloworld
 ```
 
 ### 截图 / 交互 / 布局树
 
 ```powershell
-devecocli ui screenshot --device "Pura X Max" --path .\shots\01.png   # 文件已存在会报错，每次换名
-devecocli ui click --device "Pura X Max" 620 720                     # 当前方向下的 px 坐标
-devecocli ui longclick --device "Pura X Max" 620 720
-devecocli ui swipe --device "Pura X Max" 1200 1500 1200 650 --speed 2000
-devecocli ui dircfling --device "Pura X Max" up                      # 方向翻页（滚动列表）
-devecocli ui text --device "Pura X Max" "氯雷他定"                    # 往当前焦点输入
-devecocli ui layout --device "Pura X Max" --format json              # 可见区域布局树（bounds 单位 px）
-devecocli ui window list --device "Pura X Max" --format json
+devecocli ui screenshot --device "<dev>" --path .\shots\01.png   # 文件已存在会报错，每次换名
+devecocli ui click --device "<dev>" 620 720                     # 当前方向下的 px 坐标
+devecocli ui longclick --device "<dev>" 620 720
+devecocli ui swipe --device "<dev>" 1200 1500 1200 650 --speed 2000
+devecocli ui dircfling --device "<dev>" up                      # 方向翻页（滚动列表）
+devecocli ui text --device "<dev>" "氯雷他定"                    # 往当前焦点输入
+devecocli ui layout --device "<dev>" --format json              # 可见区域布局树（bounds 单位 px）
+devecocli ui window list --device "<dev>" --format json
 ```
 
 `ui layout --format json` 的输出前后会混入 CLI 的版本提示，解析前先截取第一个 `[` 到最后一个 `]`：
 
 ```powershell
-$raw = (devecocli ui layout --format json 2>$null) -join "`n"
+$raw = (devecocli ui layout --device "<dev>" --format json 2>$null) -join "`n"
 $json = $raw.Substring($raw.IndexOf('['), $raw.LastIndexOf(']') - $raw.IndexOf('[') + 1) | ConvertFrom-Json
 ```
 
-### 折叠 / 旋转
+### 折叠 / 旋转（仅模拟器）
 
 ```powershell
-devecocli emulator fold close --target "Pura X Max"   # 单屏态
-devecocli emulator fold open  --target "Pura X Max"   # 双屏态（保持当前方向）
-devecocli emulator rotate right --target "Pura X Max" # 旋转 90°，横竖屏切换靠它
+devecocli emulator fold close --target "<dev>"   # 单屏态
+devecocli emulator fold open  --target "<dev>"   # 双屏态（保持当前方向）
+devecocli emulator rotate right --target "<dev>" # 旋转 90°，横竖屏切换靠它
 ```
 
 ### 查设备信息
 
 ```powershell
-devecocli device list
-devecocli emulator list
-hdc -t 127.0.0.1:5555 shell hidumper -s RenderService -a screen              # 当前渲染分辨率
-hdc -t 127.0.0.1:5555 shell "hidumper -s DisplayManagerService -a '-a'"      # Density / DPI
-devecocli device view -t "Pura X Max"                                        # 设备详情
+devecocli device list                                                          # 设备名 / 序列号
+devecocli emulator list                                                        # 模拟器实例
+devecocli device view -t "<dev>"                                               # 设备详情
+hdc -t <serial> shell hidumper -s RenderService -a screen                      # 当前渲染分辨率
+hdc -t <serial> shell "hidumper -s DisplayManagerService -a '-a'"              # Density / DPI
 ```
 
 ---
@@ -194,8 +192,8 @@ devecocli device view -t "Pura X Max"                                        # �
 3. **注册路由**：在对应分类页文件的 `XXX_CASES` 里追加一条（`caseRoute` / `caseTitle` /
    `caseTag` / `caseIcon` / `caseSummary` / `casePage`），并补一个 `@Builder`。
 4. **同步数量**：分类的 `categoryCaseCount` 用导出的 `XXX_CASE_COUNT`，首页卡片文案只写现象。
-5. **三态自测**：在模拟器上切单屏 / 双屏竖屏 / 双屏横屏各截一张，确认只有目标屏态出问题、
-   另外两态干净；再在真机上手动折叠 + 旋转复核一遍。
+5. **三态自测**：在模拟器上切单屏 / 双屏竖屏 / 双屏横屏各截一张，确认该案例的目标屏态稳定复现；
+   另外两态按复刻对象核对，以原 App 截图的实际表现为准（不要求「一定完全正常」）。
 6. **构建 + lint + 提交**。
 
 > 写 `.ets` 前，若当前环境装有 `hmos-arkui-develop-skill`（ArkTS 致命坑清单 / API 签名）
@@ -224,8 +222,8 @@ devecocli device view -t "Pura X Max"                                        # �
 
 ## 六、已知坑
 
-1. **多设备必须选目标**：真机 + 模拟器同时在线，`ui` / `log` / `run` 不带 `--device` 会报
-   `Multiple devices found`，`emulator` 子命令不带 `--target` 同理。
+1. **多设备必须选目标**：同时连着真机和模拟器时，`ui` / `log` / `run` 不带 `--device` 会报
+   `Multiple devices found`；`emulator` 子命令的 `--target` 是必填项。
 2. **`rotate` 不一定立即生效**：命令返回 success 但方向可能没变（会被合并 / 延后到下一次窗口变化），
    必须截图后按图片尺寸判断当前方向；不生效就再发一次，或改用 `rotate right`。切换页面 / 重装
    也可能把方向带回竖屏。
