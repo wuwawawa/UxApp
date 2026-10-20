@@ -29,6 +29,7 @@ import { VipRenewalSheetTruncationPage } from './VipRenewalSheetTruncation';
 import { BikeGiftDialogTruncationPage } from './BikeGiftDialogTruncation';
 import { CouponRulesDialogTruncationPage } from './CouponRulesDialogTruncation';
 import { PharmacySearchTruncationPage } from './PharmacySearchTruncation';
+import { LoginPageOverlapTruncationPage } from './LoginPageOverlapTruncation';
 
 interface TruncationCaseEntry {
   caseRoute: string;
@@ -75,6 +76,11 @@ function couponRulesCasePage(pageStack: NavPathStack) {
 @Builder
 function pharmacySearchCasePage(pageStack: NavPathStack) {
   PharmacySearchTruncationPage({ pageStack: pageStack })
+}
+
+@Builder
+function loginOverlapCasePage(pageStack: NavPathStack) {
+  LoginPageOverlapTruncationPage({ pageStack: pageStack })
 }
 
 /** 截断重叠分类下的全部案例，新增案例时在这里追加一条 */
@@ -127,6 +133,13 @@ const TRUNCATION_CASES: TruncationCaseEntry[] = [
     caseTag: '文字截断',
     caseIcon: '药',
     casePage: wrapBuilder(pharmacySearchCasePage)
+  },
+  {
+    caseRoute: 'truncation/login-overlap',
+    caseTitle: '美团登录页文字重叠',
+    caseTag: '文字重叠',
+    caseIcon: '登',
+    casePage: wrapBuilder(loginOverlapCasePage)
   }
 ];
 
