@@ -5,7 +5,7 @@
 **不允许留下任何能直接得到答案的东西**（见下一节「铁律」）。
 
 - 应用包名：`com.example.helloworld`（入口 Ability：`EntryAbility`，首页 `pages/Index`）
-- 当前内容：4 个问题分类，其中「截断重叠」8 个案例、「大图大字」1 个案例，另 2 个分类待补
+- 当前内容：4 个问题分类，其中「截断重叠」8 个案例、「大图大字」2 个案例，另 2 个分类待补
 - 验证方式：以常驻模拟器为主，设备名 / 序列号每次用 `devecocli device list` 现查，
   命令里显式指定 `--device` / `--target`（详见第三节）
 
@@ -68,10 +68,11 @@ UxApp/
 │       │       │   └── LoginPageOverlapTruncation.ets
 │       │       └── bigcontent/                # 分类 04「大图大字」
 │       │           ├── BigContentCaseList.ets      # 分类页：案例表 + 页面注册
-│       │           └── PharmacyProductBigImage.ets # 看病买药商品图放大
+│       │           ├── PharmacyProductBigImage.ets # 看病买药商品图放大
+│       │           └── HemaMatchGridBigContent.ets # 盒马搭配商品图与字号放大
 │       └── resources/base/
 │           ├── element/          # color / float / string
-│           ├── media/            # 图标 + 从截图裁出的真实素材（product_*.jpg 等）
+│           ├── media/            # 图标 + 从截图裁出的真实素材（product_*.jpg、hema_match_*.jpg 等）
 │           └── profile/main_pages.json
 ├── tools/                        # 参考截图（原始证据，不入库）；hdc_screenshot.bat 辅助脚本
 ├── shots/                        # 本机验证截图（临时目录，不入库）

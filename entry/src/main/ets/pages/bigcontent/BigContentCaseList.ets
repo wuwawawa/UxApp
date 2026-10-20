@@ -22,6 +22,7 @@
  */
 
 import { PharmacyProductBigImagePage } from './PharmacyProductBigImage';
+import { HemaMatchGridBigContentPage } from './HemaMatchGridBigContent';
 
 interface BigContentCaseEntry {
   caseRoute: string;
@@ -42,6 +43,11 @@ function pharmacyProductBigImageCasePage(pageStack: NavPathStack) {
   PharmacyProductBigImagePage({ pageStack: pageStack })
 }
 
+@Builder
+function hemaMatchGridCasePage(pageStack: NavPathStack) {
+  HemaMatchGridBigContentPage({ pageStack: pageStack })
+}
+
 /** 「大图大字」分类下的全部案例，新增案例时在这里追加一条 */
 const BIG_CONTENT_CASES: BigContentCaseEntry[] = [
   {
@@ -51,6 +57,14 @@ const BIG_CONTENT_CASES: BigContentCaseEntry[] = [
     caseIcon: '图',
     caseSummary: '横屏下一屏只剩一行商品，商品图占满屏幕',
     casePage: wrapBuilder(pharmacyProductBigImageCasePage)
+  },
+  {
+    caseRoute: 'bigcontent/hema-match-grid',
+    caseTitle: '盒马搭配商品网格',
+    caseTag: '大字',
+    caseIcon: '字',
+    caseSummary: '双屏态下商品图与字号一起放大 1.45～2 倍',
+    casePage: wrapBuilder(hemaMatchGridCasePage)
   }
 ];
 
