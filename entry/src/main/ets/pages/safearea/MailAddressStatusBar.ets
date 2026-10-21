@@ -30,7 +30,7 @@
  *   保存按钮：距末行 53.8vp、高 45vp、宽 90%、圆角 4vp、#FDEFEF 底 + 白字 15.5vp。
  *   三态都不随窗口缩放，尺寸与单屏态一致。
  *
- * 三态实测（键盘顶 / 整页上移量）：
+ * 三态实测（键盘顶 / 整页上移量；进入页面即自动聚焦「邮编号码」，不用点）：
  *   单屏态      459.6×672vp   —— 键盘顶 357.8vp，整页上移 118.9vp，标题栏整条推出屏幕，
  *                                「国家/地区」落到 y -0.4～10.5vp（上沿被裁 0.4vp），
  *                                「请选择」（y 24.7～37.8vp）压住状态栏时间（15.3～27.3vp）
@@ -110,6 +110,14 @@ const MB_SECTION_BAR: string = '#F4F5F7';
 const MB_SAVE_BG: string = '#FDEFEF';
 const MB_FOCUS_LINE: string = '#333333';
 
+/** 邮编号码输入框的 focus key：进入页面后按它取焦点 */
+const MB_POSTCODE_ID: string = 'mail-postcode-input';
+/** 自动聚焦延迟：等 NavDestination 转场结束，键盘才不会和入场动画打架 */
+const MB_AUTO_FOCUS_DELAY: number = 450;
+/** 首次没取到焦点时的重试间隔与最多尝试次数 */
+const MB_AUTO_FOCUS_RETRY: number = 300;
+const MB_AUTO_FOCUS_ATTEMPTS: number = 3;
+
 interface MailAddressRow {
   rowKey: string;
   rowLabel: string;
@@ -153,14 +161,21 @@ export struct MailAddressStatusBarPage {
 
   private pageActive: boolean = false;
   private windowToken: number = 0;
+  private autoFocusTimer: number = -1;
+  private autoFocusAttempts: number = 0;
 
   aboutToAppear(): void {
     this.pageActive = true;
     this.enterImmersiveMode();
+    this.scheduleAutoFocus(MB_AUTO_FOCUS_DELAY);
   }
 
   aboutToDisappear(): void {
     this.pageActive = false;
+    if (this.autoFocusTimer >= 0) {
+      clearTimeout(this.autoFocusTimer);
+      this.autoFocusTimer = -1;
+    }
     if (this.windowToken > 0) {
       WindowModeController.release(this.windowToken);
       this.windowToken = 0;
@@ -192,6 +207,24 @@ export struct MailAddressStatusBarPage {
       return 0;
     }
     return this.winWidthVp * MB_SAVE_WIDTH_RATIO;
+  }
+
+  /** 进入页面后自动把焦点给邮编号码：焦点一到，系统就会把键盘拉起来 */
+  private scheduleAutoFocus(delay: number): void {
+    if (this.autoFocusTimer >= 0) {
+      clearTimeout(this.autoFocusTimer);
+    }
+    this.autoFocusTimer = setTimeout(() => {
+      this.autoFocusTimer = -1;
+      if (!this.pageActive || this.postcodeFocused) {
+        return;
+      }
+      this.getUIContext().getFocusController().requestFocus(MB_POSTCODE_ID);
+      this.autoFocusAttempts += 1;
+      if (this.autoFocusAttempts < MB_AUTO_FOCUS_ATTEMPTS) {
+        this.scheduleAutoFocus(MB_AUTO_FOCUS_RETRY);
+      }
+    }, delay);
   }
 
   // ------------------------------------------------------------------
@@ -285,6 +318,7 @@ export struct MailAddressStatusBarPage {
 
       if (row.rowKey === 'mail-postcode') {
         TextInput({ text: this.postcodeText, placeholder: row.rowPlaceholder })
+          .id(MB_POSTCODE_ID)
           .type(InputType.Number)
           .fontSize(MB_VALUE_FONT)
           .fontColor('#333333')
