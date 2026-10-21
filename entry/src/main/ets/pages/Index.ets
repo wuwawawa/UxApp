@@ -15,7 +15,6 @@
 
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { CategoryPlaceholderPage } from './CategoryPlaceholder';
 import {
   TRUNCATION_CASE_COUNT,
   TRUNCATION_CATEGORY_PAGE,
@@ -31,6 +30,11 @@ import {
   SAFE_AREA_CATEGORY_PAGE,
   resolveSafeAreaCasePage
 } from './safearea/SafeAreaCaseList';
+import {
+  WHITESPACE_CASE_COUNT,
+  WHITESPACE_CATEGORY_PAGE,
+  resolveWhitespaceCasePage
+} from './whitespace/WhitespaceCaseList';
 
 /**
  * 反例目录首页：按问题类型分类。
@@ -54,11 +58,6 @@ interface HomeCategory {
   /** 已有案例数；0 表示分类还在整理，进入占位页 */
   categoryCaseCount: number;
   categoryPage: WrappedBuilder<[NavPathStack]>;
-}
-
-@Builder
-function marginCategoryPage(pageStack: NavPathStack) {
-  CategoryPlaceholderPage({ pageStack: pageStack, categoryTitle: '边距过大' })
 }
 
 /** 路由未登记时的兜底页，避免白屏 */
@@ -112,12 +111,12 @@ const HOME_CATEGORIES: HomeCategory[] = [
     categoryPage: SAFE_AREA_CATEGORY_PAGE
   },
   {
-    categoryRoute: 'category/margin',
+    categoryRoute: 'category/whitespace',
     categoryIndex: '03',
-    categoryTitle: '边距过大',
-    categoryDesc: '折叠态 / 展开态间距失衡，留白明显过多',
-    categoryCaseCount: 0,
-    categoryPage: wrapBuilder(marginCategoryPage)
+    categoryTitle: '留白过多',
+    categoryDesc: '宽窗口下内容挤在一侧，或上下之间空出一大块',
+    categoryCaseCount: WHITESPACE_CASE_COUNT,
+    categoryPage: WHITESPACE_CATEGORY_PAGE
   },
   {
     categoryRoute: 'category/big-content',
@@ -147,6 +146,10 @@ function resolvePage(routeName: string): WrappedBuilder<[NavPathStack]> {
   const bigContentCasePage: WrappedBuilder<[NavPathStack]> | undefined = resolveBigContentCasePage(routeName);
   if (bigContentCasePage !== undefined) {
     return bigContentCasePage;
+  }
+  const whitespaceCasePage: WrappedBuilder<[NavPathStack]> | undefined = resolveWhitespaceCasePage(routeName);
+  if (whitespaceCasePage !== undefined) {
+    return whitespaceCasePage;
   }
   return ROUTE_NOT_FOUND_PAGE;
 }
