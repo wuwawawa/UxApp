@@ -120,6 +120,30 @@ UxApp/
   `ui` / `log` / `run` 用 `--device <name|serial>`，`emulator` 子命令用 `--target <name|serial>`。
 - 不指定目标时，只要当前连接了多台设备就会报 `Multiple devices found`。
 
+#### 没有设备可用时：自己拉起模拟器
+
+`devecocli device list` 一台都没有（原样输出 `No active devices.` + 一句提示启动模拟器），或
+`run` 报 `NO_DEVICE_AVAILABLE` / `No active devices` 时，**不要让用户手动去开、也不要空等**，
+自己把常驻模拟器起起来：
+
+```powershell
+devecocli emulator list                    # 实例清单：Status=stopped 就是没在跑的
+devecocli emulator start "Pura X Max"      # 起常驻实例（名字带空格，必须加引号）
+devecocli device list                      # 轮询到它出现为止：Serial 由 - 变成 127.0.0.1:5555
+```
+
+- `start` 是**异步**的：返回 `started successfully` 只代表进程拉起来了。必须等到 `device list`
+  里出现这台设备（实测冷启约 70s，再启动会快一些）再执行 `run` / `ui` / `log`，否则会
+  `No active devices`；轮询间隔 3s 左右即可。
+- 跑完不要停模拟器，保持常驻，下次直接 `device list` 复用。
+- 起来之后照旧现查名字 / 序列号：重启模拟器后端口可能变，不要沿用旧值。
+- `Pura X Max` 起不来就换 `Pura X Max2`；只有明确提示协议 / license 未接受时才交给用户处理
+  （`devecocli emulator license`，需要交互终端），不要反复重试。
+- `devecocli run --device "<已停止的模拟器>"` 会顺手把它拉起来，但 `ui` / `log` 不会 ——
+  所以统一先按上面三步起设备、轮询到可用，再跑别的子命令。
+- 刚起来的设备会沿用上次的折叠 / 旋转状态：接手后第一个动作建议 `fold close`（单屏态基准）
+  再截一张图确认方向，别假设它已经是你想要的屏态。
+
 ---
 
 ## 四、常用命令
@@ -175,11 +199,12 @@ devecocli emulator fold open  --target "<dev>"   # 双屏态（保持当前方�
 devecocli emulator rotate right --target "<dev>" # 旋转 90°，横竖屏切换靠它
 ```
 
-### 查设备信息
+### 查设备信息 / 起设备
 
 ```powershell
 devecocli device list                                                          # 设备名 / 序列号
-devecocli emulator list                                                        # 模拟器实例
+devecocli emulator list                                                        # 模拟器实例（stopped 即没在跑）
+devecocli emulator start "<name>"                                              # 没设备时自己拉起，再轮询 device list
 devecocli device view -t "<dev>"                                               # 设备详情
 hdc -t <serial> shell hidumper -s RenderService -a screen                      # 当前渲染分辨率
 hdc -t <serial> shell "hidumper -s DisplayManagerService -a '-a'"              # Density / DPI
@@ -244,6 +269,11 @@ hdc -t <serial> shell "hidumper -s DisplayManagerService -a '-a'"              #
    `setWindowLayoutFullScreen`，页面进入 `acquire`、退出 `release`，不要自己直接调窗口接口。
 8. **`devecocli ui screenshot` 不覆盖已有文件**：同一路径第二次会报
    `Screenshot file already exists`，每次给新路径。
+9. **没设备就自己起**：`device list` 为空 / `run` 报 `NO_DEVICE_AVAILABLE` 时，按第三节
+   「没有设备可用时」自己 `emulator start`，轮询 `device list` 到该设备出现再继续，
+   不要停下来等用户去开模拟器；`emulator start` 返回成功 ≠ 已可连。
+10. **模拟器会掉**：机器休眠 / 重启 / 模拟器被关掉后 `Status` 会变成 `stopped`，`Serial` 变回 `-`；
+    接手任务先 `device list`，空了就按上一条重新拉起，别照抄上次的序列号。
 
 ---
 
