@@ -144,6 +144,26 @@ devecocli device list                      # 轮询到它出现为止：Serial �
 - 刚起来的设备会沿用上次的折叠 / 旋转状态：接手后第一个动作建议 `fold close`（单屏态基准）
   再截一张图确认方向，别假设它已经是你想要的屏态。
 
+#### 任务收尾：把设备恢复成双屏态横屏
+
+一轮任务里会反复 `fold close` / `fold open` / `rotate`，设备很容易停在单屏态或双屏竖屏。
+**收尾（提交 / 交付前）必须把模拟器恢复成「双屏态横屏」**：2584×1828px、窗口 939.6×664.7vp，
+状态栏沿上边长边；不要留在单屏态、双屏竖屏或单屏横屏。
+
+```powershell
+devecocli emulator fold open --target "<dev>"                 # 先确保是展开态
+devecocli ui screenshot --device "<dev>" --path .\shots\restore-<n>.png
+# 按图片宽高判形态（不要信命令返回值，rotate 会滞后）：
+#   2584×1828 = 双屏态横屏 → 目标形态，就停在这里
+#   1828×2584 = 双屏态竖屏 → 再 rotate right 一次
+#   1264×1848 / 1848×1264 = 单屏态 → 回到上面补 fold open
+devecocli emulator rotate right --target "<dev>"              # 竖屏时补一次（每次转 90°）
+```
+
+- 判定只看截图：宽 > 高才是横屏。`rotate` 返回 success 不代表已生效，转完隔 3~5s 重截一张确认。
+- `fold open` 自己就可能把方向带成横屏（本机实测会），也可能保持竖屏 —— 一律以截图尺寸为准。
+- 恢复完再 `devecocli device list` 确认设备仍在线，并把这个最终形态写进交付说明。
+
 ---
 
 ## 四、常用命令
@@ -227,7 +247,8 @@ hdc -t <serial> shell "hidumper -s DisplayManagerService -a '-a'"              #
 4. **同步数量**：分类的 `categoryCaseCount` 用导出的 `XXX_CASE_COUNT`，首页卡片文案只写现象。
 5. **三态自测**：在模拟器上切单屏 / 双屏竖屏 / 双屏横屏各截一张，确认该案例的目标屏态稳定复现；
    另外两态按复刻对象核对，以原 App 截图的实际表现为准（不要求「一定完全正常」）。
-6. **构建 + lint + 提交**。
+6. **构建 + lint + 收尾**：`devecocli build`、`devecocli check lint` 通过后，按第三节
+   「任务收尾」把设备恢复成**双屏态横屏**（截图 2584×1828）再提交。
 
 > 写 `.ets` 前，若当前环境装有 `hmos-arkui-develop-skill`（ArkTS 致命坑清单 / API 签名）
 > 与 `deveco-cli`（构建、部署、设备、UI 操作）两个技能，先加载它们再动手；本仓库的
@@ -259,7 +280,7 @@ hdc -t <serial> shell "hidumper -s DisplayManagerService -a '-a'"              #
    `Multiple devices found`；`emulator` 子命令的 `--target` 是必填项。
 2. **`rotate` 不一定立即生效**：命令返回 success 但方向可能没变（会被合并 / 延后到下一次窗口变化），
    必须截图后按图片尺寸判断当前方向；不生效就再发一次，或改用 `rotate right`。切换页面 / 重装
-   也可能把方向带回竖屏。
+   也可能把方向带走。所以**收尾必须按第三节把设备恢复成双屏态横屏（2584×1828）**。
 3. **截图可能拿到上一帧**：点进去后立刻截图有机会拿到旧画面。等 1.5~2s 再截，或换文件名重截一张。
 4. **`ui click` 用的是当前方向的 px 坐标**，不是 vp，旋转后要重新量（可用 `ui layout` 取 bounds 中心）。
 5. **不要用 PowerShell 的 `Set-Content` 改 `.ets`**：会把 UTF-8 写成 GBK，出现
@@ -283,4 +304,5 @@ hdc -t <serial> shell "hidumper -s DisplayManagerService -a '-a'"              #
   `feat: add xxx case`、`refactor: ...`、`docs: ...`、`fix: ...`
 - 一个案例一个 `feat:` 提交（案例页 + 分类表 + 首页路由 + 图片资源）。
 - **不要提交**：`tools/` 下的原始参考截图、`shots/` 下的验证截图、`repro/` 与构建产物（部分已在 `.gitignore`）。
-- 提交前确认 `git status` 里只剩预期文件，并保证 `devecocli build`、`devecocli check lint` 通过。
+- 提交前确认 `git status` 里只剩预期文件，并保证 `devecocli build`、`devecocli check lint` 通过；
+  同时确认设备已恢复成**双屏态横屏**（2584×1828，见第三节「任务收尾」）。
