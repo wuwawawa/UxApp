@@ -5,8 +5,8 @@
 **不允许留下任何能直接得到答案的东西**（见下一节「铁律」）。
 
 - 应用包名：`com.example.helloworld`（入口 Ability：`EntryAbility`，首页 `pages/Index`）
-- 当前内容：4 个问题分类，其中「截断重叠」8 个案例、「未避让安全区」3 个案例、
-  「大图大字」2 个案例，另 1 个分类待补
+- 当前内容：4 个问题分类 —— 「截断重叠」8 个案例、「未避让安全区」3 个案例、
+  「留白过多」13 个案例、「大图大字」2 个案例
 - 验证方式：以常驻模拟器为主，设备名 / 序列号每次用 `devecocli device list` 现查，
   命令里显式指定 `--device` / `--target`（详见第三节）
 
@@ -56,7 +56,6 @@ UxApp/
 │       │   │   └── MeituanBikeScene.ets       # 美团骑车首页公共场景
 │       │   └── pages/
 │       │       ├── Index.ets                  # 首页：4 个问题分类 + 统一路由解析 resolvePage
-│       │       ├── CategoryPlaceholder.ets    # 未整理分类的占位页
 │       │       ├── truncation/                # 分类 01「截断重叠」
 │       │       │   ├── TruncationCaseList.ets      # 分类页：案例表 + 搜索/标签筛选 + 页面注册
 │       │       │   ├── FilterDialogTruncation.ets
@@ -72,6 +71,21 @@ UxApp/
 │       │       │   ├── FlightFilterStatusBar.ets   # 机票筛选面板压状态栏
 │       │       │   ├── MailAddressStatusBar.ets    # 邮寄地址页拉起键盘压状态栏
 │       │       │   └── ProfilePhoneStatusBar.ets   # 我的页手机号压状态栏
+│       │       ├── whitespace/                # 分类 03「留白过多」
+│       │       │   ├── WhitespaceCaseList.ets      # 分类页：案例表 + 搜索/标签筛选 + 页面注册
+│       │       │   ├── GameCenterList.ets          # 游戏中心列表右侧空白
+│       │       │   ├── PodcastCatalogSheet.ets     # 播客目录弹层「播放」到首集空白
+│       │       │   ├── JobSearchCards.ets          # 招聘结果卡片右侧空白
+│       │       │   ├── BankTransferHome.ets        # 转账首页「常用转账」下方空白
+│       │       │   ├── FandengRankBoard.ets        # 榜单页右侧整列空白
+│       │       │   ├── FlightStatusDetail.ets      # 航班动态页整屏空白
+│       │       │   ├── CarSpecCompare.ets          # 配置对比表右侧空白
+│       │       │   ├── BaiduSearchHot.ets          # 百度热搜榜大面积留白
+│       │       │   ├── LuckinSearchResult.ets      # 咖啡搜索结果右侧空白
+│       │       │   ├── QidianBrowseHistory.ets     # 浏览历史右侧空白
+│       │       │   ├── QidianMonthRank.ets         # 月票榜右侧空白
+│       │       │   ├── BookshelfHistory.ets        # 书架历史右侧空白
+│       │       │   └── GalaxyNewsFavorite.ets      # 资讯收藏页整屏空白
 │       │       └── bigcontent/                # 分类 04「大图大字」
 │       │           ├── BigContentCaseList.ets      # 分类页：案例表 + 页面注册
 │       │           ├── PharmacyProductBigImage.ets # 看病买药商品图放大
