@@ -238,7 +238,7 @@ export struct WeiboUserCenterMarginsPage {
   }
 
   // ------------------------------------------------------------------
-  // 窗口级标题栏：返回「‹」与「···」贴窗口左右边缘；标题只在单屏态出现
+  // 窗口级标题栏：返回「‹」与「···」贴窗口左右边缘
   // ------------------------------------------------------------------
 
   @Builder
@@ -269,32 +269,45 @@ export struct WeiboUserCenterMarginsPage {
 
   @Builder
   navOverlay() {
-    Stack({ alignContent: Alignment.Center }) {
-      Row() {
-        this.backChevron()
+    Row() {
+      this.backChevron()
 
-        Blank()
+      Blank()
 
-        Text('•••')
-          .fontSize(14)
-          .fontColor('#3B3B3B')
-          .letterSpacing(3)
-      }
-      .width('100%')
-      .height('100%')
-      .padding({ left: 11, right: 12 })
-      .alignItems(VerticalAlign.Center)
+      Text('•••')
+        .fontSize(14)
+        .fontColor('#3B3B3B')
+        .letterSpacing(3)
+    }
+    .width('100%')
+    .height(34)
+    .padding({ left: 11, right: 12 })
+    .alignItems(VerticalAlign.Center)
+    .margin({ top: 38 })
+  }
+
+  // ------------------------------------------------------------------
+  // 顶部装扮横幅：单屏态页面标题压在横幅上，随页面一起滚走
+  // ------------------------------------------------------------------
+
+  @Builder
+  bannerBlock() {
+    Stack({ alignContent: Alignment.Top }) {
+      Image($r('app.media.ws_wb_banner'))
+        .width('100%')
+        .height(WSUC_BANNER_HEIGHT)
+        .objectFit(ImageFit.Cover)
 
       Text('用户中心')
         .fontSize(20)
         .fontWeight(FontWeight.Medium)
         .fontColor('#3A2B27')
         .maxLines(1)
+        .margin({ top: 41 })
         .visibility(this.winWidthVp <= WSUC_SINGLE_WIDTH + 0.5 ? Visibility.Visible : Visibility.None)
     }
     .width('100%')
-    .height(34)
-    .margin({ top: 38 })
+    .height(WSUC_BANNER_HEIGHT)
   }
 
   // ------------------------------------------------------------------
@@ -614,13 +627,10 @@ export struct WeiboUserCenterMarginsPage {
           .backgroundColor(WSUC_GUTTER_BG)
 
         Column() {
-          Stack({ alignContent: Alignment.TopEnd }) {
-            Scroll() {
+          Scroll() {
+            Stack({ alignContent: Alignment.TopEnd }) {
               Column() {
-                Image($r('app.media.ws_wb_banner'))
-                  .width('100%')
-                  .height(WSUC_BANNER_HEIGHT)
-                  .objectFit(ImageFit.Cover)
+                this.bannerBlock()
 
                 Column() {
                   this.levelCard()
@@ -649,22 +659,22 @@ export struct WeiboUserCenterMarginsPage {
                   .margin({ top: WSUC_LUCKY_GAP })
               }
               .width('100%')
+
+              /** 右侧橙色侧边条：钉在等级卡右侧的页面上，跟着页面一起滚走 */
+              Row()
+                .width(20)
+                .height(120)
+                .backgroundColor('#FFAC6A')
+                .borderRadius({ topLeft: 10, bottomLeft: 10 })
+                .margin({ top: 247.3 })
             }
             .width('100%')
-            .height('100%')
-            .scrollBar(BarState.Off)
-            .edgeEffect(EdgeEffect.None)
-            .align(Alignment.Top)
-
-            Row()
-              .width(20)
-              .height(120)
-              .backgroundColor('#FFAC6A')
-              .borderRadius({ topLeft: 10, bottomLeft: 10 })
-              .margin({ top: 247.3 })
           }
           .width('100%')
           .height('100%')
+          .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.None)
+          .align(Alignment.Top)
         }
         .width(this.stageWidthVp())
         .height('100%')
