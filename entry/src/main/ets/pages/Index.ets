@@ -98,7 +98,7 @@ const HOME_CATEGORIES: HomeCategory[] = [
     categoryRoute: 'truncation',
     categoryIndex: '01',
     categoryTitle: '截断重叠',
-    categoryDesc: '弹窗、弹层的文字被父容器裁切，显示不全',
+    categoryDesc: '页面、弹窗里的文字被裁切或溢出容器，显示不全',
     categoryCaseCount: TRUNCATION_CASE_COUNT,
     categoryPage: TRUNCATION_CATEGORY_PAGE
   },

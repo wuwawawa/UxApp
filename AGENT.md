@@ -5,7 +5,7 @@
 **不允许留下任何能直接得到答案的东西**（见下一节「铁律」）。
 
 - 应用包名：`com.example.helloworld`（入口 Ability：`EntryAbility`，首页 `pages/Index`）
-- 当前内容：4 个问题分类 —— 「截断重叠」8 个案例、「未避让安全区」3 个案例、
+- 当前内容：4 个问题分类 —— 「截断重叠」16 个案例、「未避让安全区」3 个案例、
   「留白过多」14 个案例、「大图大字」2 个案例
 - 验证方式：以常驻模拟器为主，设备名 / 序列号每次用 `devecocli device list` 现查，
   命令里显式指定 `--device` / `--target`（详见第三节）
@@ -65,7 +65,15 @@ UxApp/
 │       │       │   ├── BikeGiftDialogTruncation.ets
 │       │       │   ├── CouponRulesDialogTruncation.ets
 │       │       │   ├── PharmacySearchTruncation.ets
-│       │       │   └── LoginPageOverlapTruncation.ets
+│       │       │   ├── LoginPageOverlapTruncation.ets
+│       │       │   ├── FundDetailOverflow.ets       # 平安基金详情页大字溢出
+│       │       │   ├── HnaTravelProductOverflow.ets # 海航出行产品页标题溢出
+│       │       │   ├── HnaMealServiceOverlap.ets    # 海航餐食服务页文字压字
+│       │       │   ├── HnaLoungeWrap.ets            # 海航贵宾室机场名竖排
+│       │       │   ├── DisneyTicketDateOverflow.ets # 迪士尼门票日期格溢出
+│       │       │   ├── StationBoardOverflow.ets     # 车站大屏检票口压行
+│       │       │   ├── DidiDeliveryHeaderOverflow.ets # 滴滴送货首页标题叠字
+│       │       │   └── DidiOrderListOverflow.ets    # 滴滴我的订单地址溢出
 │       │       ├── safearea/                  # 分类 02「未避让安全区」
 │       │       │   ├── SafeAreaCaseList.ets        # 分类页：案例表 + 搜索/标签筛选 + 页面注册
 │       │       │   ├── FlightFilterStatusBar.ets   # 机票筛选面板压状态栏

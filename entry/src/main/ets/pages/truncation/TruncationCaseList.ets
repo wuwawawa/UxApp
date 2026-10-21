@@ -30,6 +30,14 @@ import { BikeGiftDialogTruncationPage } from './BikeGiftDialogTruncation';
 import { CouponRulesDialogTruncationPage } from './CouponRulesDialogTruncation';
 import { PharmacySearchTruncationPage } from './PharmacySearchTruncation';
 import { LoginPageOverlapTruncationPage } from './LoginPageOverlapTruncation';
+import { FundDetailOverflowPage } from './FundDetailOverflow';
+import { HnaTravelProductOverflowPage } from './HnaTravelProductOverflow';
+import { HnaMealServiceOverlapPage } from './HnaMealServiceOverlap';
+import { HnaLoungeWrapPage } from './HnaLoungeWrap';
+import { StationBoardOverflowPage } from './StationBoardOverflow';
+import { DisneyTicketDateOverflowPage } from './DisneyTicketDateOverflow';
+import { DidiDeliveryHeaderOverflowPage } from './DidiDeliveryHeaderOverflow';
+import { DidiOrderListOverflowPage } from './DidiOrderListOverflow';
 
 interface TruncationCaseEntry {
   caseRoute: string;
@@ -38,6 +46,8 @@ interface TruncationCaseEntry {
   caseTag: string;
   /** 卡片左侧的单字图标 */
   caseIcon: string;
+  /** 卡片右侧的一句话问题描述 */
+  caseSummary: string;
   /** 该案例的页面构建函数 */
   casePage: WrappedBuilder<[NavPathStack]>;
 }
@@ -83,6 +93,46 @@ function loginOverlapCasePage(pageStack: NavPathStack) {
   LoginPageOverlapTruncationPage({ pageStack: pageStack })
 }
 
+@Builder
+function fundDetailCasePage(pageStack: NavPathStack) {
+  FundDetailOverflowPage({ pageStack: pageStack })
+}
+
+@Builder
+function hnaTravelCasePage(pageStack: NavPathStack) {
+  HnaTravelProductOverflowPage({ pageStack: pageStack })
+}
+
+@Builder
+function hnaMealCasePage(pageStack: NavPathStack) {
+  HnaMealServiceOverlapPage({ pageStack: pageStack })
+}
+
+@Builder
+function hnaLoungeCasePage(pageStack: NavPathStack) {
+  HnaLoungeWrapPage({ pageStack: pageStack })
+}
+
+@Builder
+function stationBoardCasePage(pageStack: NavPathStack) {
+  StationBoardOverflowPage({ pageStack: pageStack })
+}
+
+@Builder
+function disneyTicketCasePage(pageStack: NavPathStack) {
+  DisneyTicketDateOverflowPage({ pageStack: pageStack })
+}
+
+@Builder
+function didiDeliveryCasePage(pageStack: NavPathStack) {
+  DidiDeliveryHeaderOverflowPage({ pageStack: pageStack })
+}
+
+@Builder
+function didiOrderListCasePage(pageStack: NavPathStack) {
+  DidiOrderListOverflowPage({ pageStack: pageStack })
+}
+
 /** 截断重叠分类下的全部案例，新增案例时在这里追加一条 */
 const TRUNCATION_CASES: TruncationCaseEntry[] = [
   {
@@ -90,6 +140,7 @@ const TRUNCATION_CASES: TruncationCaseEntry[] = [
     caseTitle: '购票场景文字截断',
     caseTag: '弹窗截断',
     caseIcon: '票',
+    caseSummary: '确认订单弹窗里座位与价格被下沿裁掉半截',
     casePage: wrapBuilder(filterDialogCasePage)
   },
   {
@@ -97,6 +148,7 @@ const TRUNCATION_CASES: TruncationCaseEntry[] = [
     caseTitle: '会员续费弹层截断',
     caseTag: '弹窗截断',
     caseIcon: '会',
+    caseSummary: '续费弹层底部权益文字压到支付按钮上',
     casePage: wrapBuilder(vipRenewalCasePage)
   },
   {
@@ -104,6 +156,7 @@ const TRUNCATION_CASES: TruncationCaseEntry[] = [
     caseTitle: '盒马签到弹层截断',
     caseTag: '弹窗截断',
     caseIcon: '签',
+    caseSummary: '签到弹层的奖励文案被弹层下沿裁断',
     casePage: wrapBuilder(hemaTaskSheetCasePage)
   },
   {
@@ -111,6 +164,7 @@ const TRUNCATION_CASES: TruncationCaseEntry[] = [
     caseTitle: '盒马我的菜单截断',
     caseTag: '弹窗截断',
     caseIcon: '单',
+    caseSummary: '菜单面板里「我的订单」等入口只剩半行',
     casePage: wrapBuilder(hemaMyMenuCasePage)
   },
   {
@@ -118,6 +172,7 @@ const TRUNCATION_CASES: TruncationCaseEntry[] = [
     caseTitle: '美团骑行卡赠送弹窗截断',
     caseTag: '弹窗截断',
     caseIcon: '骑',
+    caseSummary: '赠送弹窗的输入框与按钮文字被裁',
     casePage: wrapBuilder(bikeGiftCasePage)
   },
   {
@@ -125,6 +180,7 @@ const TRUNCATION_CASES: TruncationCaseEntry[] = [
     caseTitle: '美团神券规则弹窗截断',
     caseTag: '弹窗截断',
     caseIcon: '券',
+    caseSummary: '规则弹窗最后一行规则与按钮看不全',
     casePage: wrapBuilder(couponRulesCasePage)
   },
   {
@@ -132,6 +188,7 @@ const TRUNCATION_CASES: TruncationCaseEntry[] = [
     caseTitle: '看病买药搜索框截断',
     caseTag: '文字截断',
     caseIcon: '药',
+    caseSummary: '横屏时搜索框上半截被黄色标题区压掉',
     casePage: wrapBuilder(pharmacySearchCasePage)
   },
   {
@@ -139,7 +196,72 @@ const TRUNCATION_CASES: TruncationCaseEntry[] = [
     caseTitle: '美团登录页文字重叠',
     caseTag: '文字重叠',
     caseIcon: '登',
+    caseSummary: '横屏时「验证码登录」与「其他登录方式」叠在一起',
     casePage: wrapBuilder(loginOverlapCasePage)
+  },
+  {
+    caseRoute: 'truncation/fund-detail-overflow',
+    caseTitle: '基金详情页大字溢出',
+    caseTag: '文字溢出',
+    caseIcon: '基',
+    caseSummary: '涨幅行与风险标签顶出白卡，右侧半个字被屏幕切掉',
+    casePage: wrapBuilder(fundDetailCasePage)
+  },
+  {
+    caseRoute: 'truncation/hna-travel-product',
+    caseTitle: '海航出行产品页标题溢出',
+    caseTag: '文字溢出',
+    caseIcon: '航',
+    caseSummary: '「请选择适合您的出行产品」三行大字压出粉色头部',
+    casePage: wrapBuilder(hnaTravelCasePage)
+  },
+  {
+    caseRoute: 'truncation/hna-meal-service',
+    caseTitle: '海航餐食页文字压字',
+    caseTag: '文字重叠',
+    caseIcon: '餐',
+    caseSummary: '三张餐食卡片的标题与正文互相压盖',
+    casePage: wrapBuilder(hnaMealCasePage)
+  },
+  {
+    caseRoute: 'truncation/hna-lounge',
+    caseTitle: '海航贵宾室机场名竖排',
+    caseTag: '文字折行',
+    caseIcon: '厅',
+    caseSummary: '「美兰国际机场」逐字竖排，产品卡文字被右边缘切掉',
+    casePage: wrapBuilder(hnaLoungeCasePage)
+  },
+  {
+    caseRoute: 'truncation/disney-ticket',
+    caseTitle: '迪士尼门票日期格溢出',
+    caseTag: '文字溢出',
+    caseIcon: '迪',
+    caseSummary: '日期格字号撑破格子，橙色价格被下沿裁掉',
+    casePage: wrapBuilder(disneyTicketCasePage)
+  },
+  {
+    caseRoute: 'truncation/station-board',
+    caseTitle: '车站大屏检票口压行',
+    caseTag: '文字重叠',
+    caseIcon: '站',
+    caseSummary: '检票口两行字压到下一行，状态大字跨行',
+    casePage: wrapBuilder(stationBoardCasePage)
+  },
+  {
+    caseRoute: 'truncation/didi-delivery-home',
+    caseTitle: '滴滴送货首页标题叠字',
+    caseTag: '文字重叠',
+    caseIcon: '送',
+    caseSummary: '「送货」竖排字与「滴滴送货 | 武汉」叠在一起',
+    casePage: wrapBuilder(didiDeliveryCasePage)
+  },
+  {
+    caseRoute: 'truncation/didi-order-list',
+    caseTitle: '滴滴我的订单地址溢出',
+    caseTag: '文字溢出',
+    caseIcon: '单',
+    caseSummary: '订单地址冲出卡片，被屏幕右边缘切断',
+    casePage: wrapBuilder(didiOrderListCasePage)
   }
 ];
 
@@ -373,24 +495,33 @@ export struct TruncationCaseListPage {
         .backgroundColor('#F8E8E2')
         .borderRadius(10)
 
-      Row() {
-        Text(caseEntry.caseTitle)
-          .fontSize(16)
-          .fontWeight(FontWeight.Medium)
-          .fontColor('#14161A')
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      Column({ space: 6 }) {
+        Row({ space: 8 }) {
+          Text(caseEntry.caseTitle)
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .fontColor('#14161A')
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-        Text(caseEntry.caseTag)
-          .fontSize(10)
-          .fontColor('#E2452B')
-          .backgroundColor('#FBE7E0')
-          .borderRadius(3)
-          .padding({ left: 5, right: 5, top: 2, bottom: 2 })
-          .margin({ left: 8 })
+          Text(caseEntry.caseTag)
+            .fontSize(10)
+            .fontColor('#E2452B')
+            .backgroundColor('#FBE7E0')
+            .borderRadius(3)
+            .padding({ left: 5, right: 5, top: 2, bottom: 2 })
+        }
+        .alignItems(VerticalAlign.Center)
+
+        Text(caseEntry.caseSummary)
+          .fontSize(11.5)
+          .lineHeight(17)
+          .fontColor('#7A756B')
+          .maxLines(2)
+          .width('100%')
       }
       .layoutWeight(1)
-      .alignItems(VerticalAlign.Center)
+      .alignItems(HorizontalAlign.Start)
       .margin({ left: 12 })
 
       Text('›')
@@ -404,6 +535,7 @@ export struct TruncationCaseListPage {
     .border({ width: 1, color: '#E6E0D4' })
     .borderRadius(12)
     .margin({ bottom: 10 })
+    .alignItems(VerticalAlign.Center)
     .onClick(() => {
       this.pageStack.pushPathByName(caseEntry.caseRoute, '');
     })
