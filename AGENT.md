@@ -6,7 +6,7 @@
 
 - 应用包名：`com.example.helloworld`（入口 Ability：`EntryAbility`，首页 `pages/Index`）
 - 当前内容：4 个问题分类 —— 「截断重叠」8 个案例、「未避让安全区」3 个案例、
-  「留白过多」13 个案例、「大图大字」2 个案例
+  「留白过多」14 个案例、「大图大字」2 个案例
 - 验证方式：以常驻模拟器为主，设备名 / 序列号每次用 `devecocli device list` 现查，
   命令里显式指定 `--device` / `--target`（详见第三节）
 
@@ -85,7 +85,8 @@ UxApp/
 │       │       │   ├── QidianBrowseHistory.ets     # 浏览历史右侧空白
 │       │       │   ├── QidianMonthRank.ets         # 月票榜右侧空白
 │       │       │   ├── BookshelfHistory.ets        # 书架历史右侧空白
-│       │       │   └── GalaxyNewsFavorite.ets      # 资讯收藏页整屏空白
+│       │       │   ├── GalaxyNewsFavorite.ets      # 资讯收藏页整屏空白
+│       │       │   └── WeiboUserCenterMargins.ets  # 用户中心展开态两侧边距
 │       │       └── bigcontent/                # 分类 04「大图大字」
 │       │           ├── BigContentCaseList.ets      # 分类页：案例表 + 页面注册
 │       │           ├── PharmacyProductBigImage.ets # 看病买药商品图放大

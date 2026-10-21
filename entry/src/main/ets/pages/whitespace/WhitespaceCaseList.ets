@@ -20,7 +20,8 @@
  * 案例页面构建函数与 caseRoute -> 页面 的解析。Navigation 只有首页一处，这里把 caseRoute
  * 压入同一个 NavPathStack 即可，页面由首页的 navDestination 统一构建。
  *
- * 本分类下 13 个案例的标签统一是「留白」：宽窗口下内容挤在一侧、或上下之间空出一大块。
+ * 本分类下 14 个案例：宽窗口下内容挤在一侧、上下之间空出一大块，或者整页缩成中间一列
+ * 而两侧露出大片底色；后者单列为「边距」标签，其余仍是「留白」。
  */
 
 import { GameCenterListPage } from './GameCenterList';
@@ -36,6 +37,7 @@ import { QidianBrowseHistoryPage } from './QidianBrowseHistory';
 import { QidianMonthRankPage } from './QidianMonthRank';
 import { BookshelfHistoryPage } from './BookshelfHistory';
 import { GalaxyNewsFavoritePage } from './GalaxyNewsFavorite';
+import { WeiboUserCenterMarginsPage } from './WeiboUserCenterMargins';
 
 interface WhitespaceCaseEntry {
   caseRoute: string;
@@ -113,6 +115,11 @@ function bookshelfHistoryCasePage(pageStack: NavPathStack) {
 @Builder
 function galaxyNewsCasePage(pageStack: NavPathStack) {
   GalaxyNewsFavoritePage({ pageStack: pageStack })
+}
+
+@Builder
+function weiboStageCasePage(pageStack: NavPathStack) {
+  WeiboUserCenterMarginsPage({ pageStack: pageStack })
 }
 
 /** 「留白过多」分类下的全部案例，新增案例时在这里追加一条 */
@@ -220,6 +227,14 @@ const WHITESPACE_CASES: WhitespaceCaseEntry[] = [
     caseIcon: '讯',
     caseSummary: '只剩「没有更多了」与免责声明，下面整屏空',
     casePage: wrapBuilder(galaxyNewsCasePage)
+  },
+  {
+    caseRoute: 'whitespace/weibo-stage-margin',
+    caseTitle: '用户中心展开态两侧边距',
+    caseTag: '边距',
+    caseIcon: '边',
+    caseSummary: '整页缩在正中一条手机宽度里，左右各空出一大片底灰',
+    casePage: wrapBuilder(weiboStageCasePage)
   }
 ];
 
