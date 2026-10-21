@@ -238,40 +238,12 @@ export struct WeiboUserCenterMarginsPage {
   }
 
   // ------------------------------------------------------------------
-  // 窗口级标题栏：返回「‹」与「···」贴窗口左右边缘
+  // 窗口级标题栏：右上「···」贴窗口右边
   // ------------------------------------------------------------------
-
-  @Builder
-  backChevron() {
-    Stack({ alignContent: Alignment.Center }) {
-      Row()
-        .width(10)
-        .height(1.8)
-        .backgroundColor('#2B2B2B')
-        .borderRadius(0.9)
-        .rotate({ angle: -45 })
-        .offset({ y: -3.5 })
-
-      Row()
-        .width(10)
-        .height(1.8)
-        .backgroundColor('#2B2B2B')
-        .borderRadius(0.9)
-        .rotate({ angle: 45 })
-        .offset({ y: 3.5 })
-    }
-    .width(20)
-    .height(24)
-    .onClick(() => {
-      this.pageStack.pop();
-    })
-  }
 
   @Builder
   navOverlay() {
     Row() {
-      this.backChevron()
-
       Blank()
 
       Text('•••')
