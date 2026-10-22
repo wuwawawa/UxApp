@@ -26,8 +26,6 @@ import { FlightFilterStatusBarPage } from './FlightFilterStatusBar';
 import { MailAddressStatusBarPage } from './MailAddressStatusBar';
 import { ProfileHeaderStatusBarPage } from './ProfilePhoneStatusBar';
 import { TaobaoOrderDetailNotchPage } from './TaobaoOrderDetailNotch';
-import { BiliVideoDanmakuNotchPage } from './BiliVideoDanmakuNotch';
-import { JdProductBuyNotchPage } from './JdProductBuyNotch';
 import { WeiboHomeComposeNotchPage } from './WeiboHomeComposeNotch';
 import { ElemeStoreMoreNotchPage } from './ElemeStoreMoreNotch';
 import { BankTransferNavBarPage } from './BankTransferNavBar';
@@ -36,8 +34,8 @@ import { GameStartNavBarPage } from './GameStartNavBar';
 interface SafeAreaCaseEntry {
   caseRoute: string;
   caseTitle: string;
-  /** 案例类型标签（如「状态栏」） */
-  caseTag: string;
+  /** 案例类型标签（一个案例可同时属于多个标签，如「挖孔」+「状态栏」） */
+  caseTags: string[];
   /** 卡片左侧的单字图标 */
   caseIcon: string;
   /** 卡片右侧的一句话问题描述 */
@@ -68,16 +66,6 @@ function taobaoOrderDetailCasePage(pageStack: NavPathStack) {
 }
 
 @Builder
-function biliVideoDanmakuCasePage(pageStack: NavPathStack) {
-  BiliVideoDanmakuNotchPage({ pageStack: pageStack })
-}
-
-@Builder
-function jdProductBuyCasePage(pageStack: NavPathStack) {
-  JdProductBuyNotchPage({ pageStack: pageStack })
-}
-
-@Builder
 function weiboHomeComposeCasePage(pageStack: NavPathStack) {
   WeiboHomeComposeNotchPage({ pageStack: pageStack })
 }
@@ -102,7 +90,7 @@ const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
   {
     caseRoute: 'safearea/flight-filter-statusbar',
     caseTitle: '机票筛选面板压状态栏',
-    caseTag: '状态栏',
+    caseTags: ['状态栏'],
     caseIcon: '筛',
     caseSummary: '单屏态「筛选」标题与右上角 × 只露出下半截，右侧选项被底部裁掉一行',
     casePage: wrapBuilder(flightFilterCasePage)
@@ -110,7 +98,7 @@ const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
   {
     caseRoute: 'safearea/profile-header-statusbar',
     caseTitle: '我的页手机号压状态栏',
-    caseTag: '状态栏',
+    caseTags: ['状态栏'],
     caseIcon: '号',
     caseSummary: '双屏横屏时手机号、消息/设置压住状态栏的时间与电量图标',
     casePage: wrapBuilder(profileHeaderCasePage)
@@ -118,7 +106,7 @@ const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
   {
     caseRoute: 'safearea/mail-address-statusbar',
     caseTitle: '邮寄地址页拉起键盘压状态栏',
-    caseTag: '状态栏',
+    caseTags: ['状态栏'],
     caseIcon: '址',
     caseSummary: '点「邮编号码」后标题栏滑出屏幕，表单整体上移叠在状态栏时间、电量上',
     casePage: wrapBuilder(mailAddressCasePage)
@@ -126,31 +114,15 @@ const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
   {
     caseRoute: 'safearea/taobao-order-detail',
     caseTitle: '淘宝订单详情标题压挖孔',
-    caseTag: '挖孔',
+    caseTags: ['挖孔'],
     caseIcon: '淘',
     caseSummary: '折叠态顶部「订单详情」标题正对前置摄像头挖孔，标题文字被黑色圆孔从正中穿过',
     casePage: wrapBuilder(taobaoOrderDetailCasePage)
   },
   {
-    caseRoute: 'safearea/bili-video-danmaku',
-    caseTitle: 'B站视频弹幕条压挖孔',
-    caseTag: '挖孔',
-    caseIcon: 'B',
-    caseSummary: '折叠态顶部弹幕输入条被挖孔从中间削掉一截，「发个弹幕见证当下」占位文字被黑孔盖住',
-    casePage: wrapBuilder(biliVideoDanmakuCasePage)
-  },
-  {
-    caseRoute: 'safearea/jd-product-buy',
-    caseTitle: '京东商品购买键压挖孔',
-    caseTag: '挖孔',
-    caseIcon: '京',
-    caseSummary: '双屏竖屏展开态右下角「立即购买」按钮右端被挖孔整块穿透，末字被黑孔吃掉一角',
-    casePage: wrapBuilder(jdProductBuyCasePage)
-  },
-  {
     caseRoute: 'safearea/weibo-home-compose',
     caseTitle: '微博发布按钮压挖孔',
-    caseTag: '挖孔',
+    caseTags: ['挖孔', '状态栏'],
     caseIcon: '微',
     caseSummary: '双屏横屏展开态右上角橙色「发布」按钮被挖孔从中部穿透，白色加号被黑孔盖住一半',
     casePage: wrapBuilder(weiboHomeComposeCasePage)
@@ -158,7 +130,7 @@ const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
   {
     caseRoute: 'safearea/eleme-store-more',
     caseTitle: '饿了么店铺更多按钮压挖孔',
-    caseTag: '挖孔',
+    caseTags: ['挖孔', '状态栏'],
     caseIcon: '饿',
     caseSummary: '双屏横屏展开态右上角「更多」圆钮被挖孔穿透，白色点阵被黑孔盖住两排',
     casePage: wrapBuilder(elemeStoreMoreCasePage)
@@ -166,7 +138,7 @@ const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
   {
     caseRoute: 'safearea/bank-transfer-navbar',
     caseTitle: '银行转账按钮压导航条',
-    caseTag: '导航条',
+    caseTags: ['导航条'],
     caseIcon: '银',
     caseSummary: '底部「确认转账」沉到导航条下方，一半按钮被小白条挡住',
     casePage: wrapBuilder(bankTransferCasePage)
@@ -174,7 +146,7 @@ const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
   {
     caseRoute: 'safearea/game-start-navbar',
     caseTitle: '游戏登录开始键压导航条',
-    caseTag: '导航条',
+    caseTags: ['导航条'],
     caseIcon: '游',
     caseSummary: '开始游戏按钮贴着屏幕底边，被导航条小白条盖住一半',
     casePage: wrapBuilder(gameStartCasePage)
@@ -196,8 +168,10 @@ interface SafeAreaTagChip {
 function collectSafeAreaTags(): string[] {
   const tagLabels: string[] = [];
   for (const caseEntry of SAFE_AREA_CASES) {
-    if (tagLabels.indexOf(caseEntry.caseTag) < 0) {
-      tagLabels.push(caseEntry.caseTag);
+    for (const caseTag of caseEntry.caseTags) {
+      if (tagLabels.indexOf(caseTag) < 0) {
+        tagLabels.push(caseTag);
+      }
     }
   }
   return tagLabels;
@@ -206,7 +180,7 @@ function collectSafeAreaTags(): string[] {
 function countSafeAreaCases(tagLabel: string): number {
   let caseCount: number = 0;
   for (const caseEntry of SAFE_AREA_CASES) {
-    if (tagLabel === SAFE_AREA_ALL_TAG || caseEntry.caseTag === tagLabel) {
+    if (tagLabel === SAFE_AREA_ALL_TAG || caseEntry.caseTags.indexOf(tagLabel) >= 0) {
       caseCount += 1;
     }
   }
@@ -261,14 +235,14 @@ export struct SafeAreaCaseListPage {
   private visibleCases(): SafeAreaCaseEntry[] {
     const keyword: string = this.searchKeyword.trim();
     return SAFE_AREA_CASES.filter((caseEntry: SafeAreaCaseEntry) => {
-      if (this.activeTag !== SAFE_AREA_ALL_TAG && caseEntry.caseTag !== this.activeTag) {
+      if (this.activeTag !== SAFE_AREA_ALL_TAG && caseEntry.caseTags.indexOf(this.activeTag) < 0) {
         return false;
       }
       if (keyword.length === 0) {
         return true;
       }
       return caseEntry.caseTitle.indexOf(keyword) >= 0 ||
-        caseEntry.caseTag.indexOf(keyword) >= 0 ||
+        caseEntry.caseTags.join(' ').indexOf(keyword) >= 0 ||
         caseEntry.caseSummary.indexOf(keyword) >= 0;
     });
   }
@@ -422,12 +396,14 @@ export struct SafeAreaCaseListPage {
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-          Text(caseEntry.caseTag)
-            .fontSize(10)
-            .fontColor('#E2452B')
-            .backgroundColor('#FBE7E0')
-            .borderRadius(3)
-            .padding({ left: 5, right: 5, top: 2, bottom: 2 })
+          ForEach(caseEntry.caseTags, (caseTag: string) => {
+            Text(caseTag)
+              .fontSize(10)
+              .fontColor('#E2452B')
+              .backgroundColor('#FBE7E0')
+              .borderRadius(3)
+              .padding({ left: 5, right: 5, top: 2, bottom: 2 })
+          }, (caseTag: string) => caseTag)
         }
         .alignItems(VerticalAlign.Center)
 
