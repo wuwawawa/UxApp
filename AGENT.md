@@ -6,7 +6,7 @@
 
 - 应用包名：`com.example.helloworld`（入口 Ability：`EntryAbility`，首页 `pages/Index`）
 - 当前内容：4 个问题分类 —— 「截断重叠」16 个案例、「未避让安全区」6 个案例、
-  「留白过多」14 个案例、「大图大字」2 个案例
+  「留白过多」14 个案例、「大图大字」10 个案例
 - 验证方式：以常驻模拟器为主，设备名 / 序列号每次用 `devecocli device list` 现查，
   命令里显式指定 `--device` / `--target`（详见第三节）
 
@@ -101,10 +101,18 @@ UxApp/
 │       │       └── bigcontent/                # 分类 04「大图大字」
 │       │           ├── BigContentCaseList.ets      # 分类页：案例表 + 页面注册
 │       │           ├── PharmacyProductBigImage.ets # 看病买药商品图放大
-│       │           └── HemaMatchGridBigContent.ets # 盒马搭配商品图与字号放大
+│       │           ├── HemaMatchGridBigContent.ets # 盒马搭配商品图与字号放大
+│       │           ├── TaobaoHomeBigBanner.ets     # 淘宝首页banner放大
+│       │           ├── PddHomeBigContent.ets       # 拼多多首页大字大图
+│       │           ├── DouyinProfileBigAvatar.ets  # 抖音个人页头像放大
+│       │           ├── JdHomeBigIcon.ets           # 京东首页金刚区放大
+│       │           ├── ElemeHomeBigBanner.ets      # 饿了么首页banner放大
+│       │           ├── WeiboHotBigText.ets         # 微博热搜大字排行
+│       │           ├── CtripHomeBigBanner.ets      # 携程首页卡片放大
+│       │           └── XhsFeedBigImage.ets         # 小红书信息流大图
 │       └── resources/base/
 │           ├── element/          # color / float / string
-│           ├── media/            # 图标 + 从截图裁出的真实素材（product_*.jpg、hema_match_*.jpg 等）
+│           ├── media/            # 图标 + 真实素材：product_*、hema_match_* 等从截图裁出；bc_*（大图大字案例）用 tools/draw_*.ps1（System.Drawing）绘制生成
 │           └── profile/main_pages.json
 ├── tools/                        # 参考截图（原始证据，不入库）；hdc_screenshot.bat 辅助脚本
 ├── shots/                        # 本机验证截图（临时目录，不入库）
