@@ -25,6 +25,7 @@
 import { FlightFilterStatusBarPage } from './FlightFilterStatusBar';
 import { MailAddressStatusBarPage } from './MailAddressStatusBar';
 import { ProfileHeaderStatusBarPage } from './ProfilePhoneStatusBar';
+import { TaobaoOrderDetailNotchPage } from './TaobaoOrderDetailNotch';
 
 interface SafeAreaCaseEntry {
   caseRoute: string;
@@ -55,6 +56,11 @@ function mailAddressCasePage(pageStack: NavPathStack) {
   MailAddressStatusBarPage({ pageStack: pageStack })
 }
 
+@Builder
+function taobaoOrderDetailCasePage(pageStack: NavPathStack) {
+  TaobaoOrderDetailNotchPage({ pageStack: pageStack })
+}
+
 /** 「未避让安全区」分类下的全部案例，新增案例时在这里追加一条 */
 const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
   {
@@ -80,6 +86,14 @@ const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
     caseIcon: '址',
     caseSummary: '点「邮编号码」后标题栏滑出屏幕，表单整体上移叠在状态栏时间、电量上',
     casePage: wrapBuilder(mailAddressCasePage)
+  },
+  {
+    caseRoute: 'safearea/taobao-order-detail',
+    caseTitle: '淘宝订单详情标题压挖孔',
+    caseTag: '挖孔',
+    caseIcon: '淘',
+    caseSummary: '折叠态顶部「订单详情」标题正对前置摄像头挖孔，标题文字被黑色圆孔从正中穿过',
+    casePage: wrapBuilder(taobaoOrderDetailCasePage)
   }
 ];
 
