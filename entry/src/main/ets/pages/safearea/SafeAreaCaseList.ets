@@ -25,6 +25,13 @@
 import { FlightFilterStatusBarPage } from './FlightFilterStatusBar';
 import { MailAddressStatusBarPage } from './MailAddressStatusBar';
 import { ProfileHeaderStatusBarPage } from './ProfilePhoneStatusBar';
+import { JdHomeBannerStatusBarPage } from './JdHomeBannerStatusBar';
+import { DouyinFeedNotchStatusBarPage } from './DouyinFeedNotch';
+import { WechatChatTitleStatusBarPage } from './WechatChatTitleStatusBar';
+import { TaobaoDetailTabNotchPage } from './TaobaoDetailTabNotch';
+import { BankTransferNavBarPage } from './BankTransferNavBar';
+import { GameStartNavBarPage } from './GameStartNavBar';
+import { QunarSearchStatusBarPage } from './QunarSearchStatusBar';
 
 interface SafeAreaCaseEntry {
   caseRoute: string;
@@ -55,6 +62,41 @@ function mailAddressCasePage(pageStack: NavPathStack) {
   MailAddressStatusBarPage({ pageStack: pageStack })
 }
 
+@Builder
+function jdHomeBannerCasePage(pageStack: NavPathStack) {
+  JdHomeBannerStatusBarPage({ pageStack: pageStack })
+}
+
+@Builder
+function douyinFeedNotchCasePage(pageStack: NavPathStack) {
+  DouyinFeedNotchStatusBarPage({ pageStack: pageStack })
+}
+
+@Builder
+function wechatChatTitleCasePage(pageStack: NavPathStack) {
+  WechatChatTitleStatusBarPage({ pageStack: pageStack })
+}
+
+@Builder
+function taobaoDetailTabCasePage(pageStack: NavPathStack) {
+  TaobaoDetailTabNotchPage({ pageStack: pageStack })
+}
+
+@Builder
+function bankTransferCasePage(pageStack: NavPathStack) {
+  BankTransferNavBarPage({ pageStack: pageStack })
+}
+
+@Builder
+function gameStartCasePage(pageStack: NavPathStack) {
+  GameStartNavBarPage({ pageStack: pageStack })
+}
+
+@Builder
+function qunarSearchCasePage(pageStack: NavPathStack) {
+  QunarSearchStatusBarPage({ pageStack: pageStack })
+}
+
 /** 「未避让安全区」分类下的全部案例，新增案例时在这里追加一条 */
 const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
   {
@@ -80,6 +122,62 @@ const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
     caseIcon: '址',
     caseSummary: '点「邮编号码」后标题栏滑出屏幕，表单整体上移叠在状态栏时间、电量上',
     casePage: wrapBuilder(mailAddressCasePage)
+  },
+  {
+    caseRoute: 'safearea/jd-home-banner',
+    caseTitle: '京东首页轮播压状态栏',
+    caseTag: '状态栏',
+    caseIcon: '京',
+    caseSummary: '双屏态轮播大图顶到屏幕顶端，时间与电量浮在banner文字上',
+    casePage: wrapBuilder(jdHomeBannerCasePage)
+  },
+  {
+    caseRoute: 'safearea/douyin-feed-notch',
+    caseTitle: '抖音视频流图标压挖孔',
+    caseTag: '挖孔',
+    caseIcon: '抖',
+    caseSummary: '横屏时右侧点赞/评论图标列压进挖孔摄像头区域被切一半',
+    casePage: wrapBuilder(douyinFeedNotchCasePage)
+  },
+  {
+    caseRoute: 'safearea/wechat-chat-title',
+    caseTitle: '微信聊天标题压状态栏',
+    caseTag: '状态栏',
+    caseIcon: '微',
+    caseSummary: '横屏时「测试群(28)」标题滑进状态栏与运营商图标叠在一起',
+    casePage: wrapBuilder(wechatChatTitleCasePage)
+  },
+  {
+    caseRoute: 'safearea/taobao-detail-tab',
+    caseTitle: '淘宝详情分类压挖孔',
+    caseTag: '挖孔',
+    caseIcon: '宝',
+    caseSummary: '顶部分类标签在横屏时顶进挖孔区，第一个标签被摄像头切掉',
+    casePage: wrapBuilder(taobaoDetailTabCasePage)
+  },
+  {
+    caseRoute: 'safearea/bank-transfer-navbar',
+    caseTitle: '银行转账按钮压导航条',
+    caseTag: '导航条',
+    caseIcon: '银',
+    caseSummary: '底部「确认转账」沉到导航条下方，一半按钮被小白条挡住',
+    casePage: wrapBuilder(bankTransferCasePage)
+  },
+  {
+    caseRoute: 'safearea/game-start-navbar',
+    caseTitle: '游戏登录开始键压导航条',
+    caseTag: '导航条',
+    caseIcon: '游',
+    caseSummary: '开始游戏按钮贴着屏幕底边，被导航条小白条盖住一半',
+    casePage: wrapBuilder(gameStartCasePage)
+  },
+  {
+    caseRoute: 'safearea/qunar-search-statusbar',
+    caseTitle: '去哪儿搜索框压状态栏',
+    caseTag: '状态栏',
+    caseIcon: '旅',
+    caseSummary: '双屏态搜索框贴到屏幕顶，输入框与状态栏时间电量重叠',
+    casePage: wrapBuilder(qunarSearchCasePage)
   }
 ];
 

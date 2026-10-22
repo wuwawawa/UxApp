@@ -23,6 +23,14 @@
 
 import { PharmacyProductBigImagePage } from './PharmacyProductBigImage';
 import { HemaMatchGridBigContentPage } from './HemaMatchGridBigContent';
+import { TaobaoHomeBigBannerPage } from './TaobaoHomeBigBanner';
+import { PddHomeBigContentPage } from './PddHomeBigContent';
+import { DouyinProfileBigAvatarPage } from './DouyinProfileBigAvatar';
+import { JdHomeBigIconPage } from './JdHomeBigIcon';
+import { ElemeHomeBigBannerPage } from './ElemeHomeBigBanner';
+import { WeiboHotBigTextPage } from './WeiboHotBigText';
+import { CtripHomeBigBannerPage } from './CtripHomeBigBanner';
+import { XhsFeedBigImagePage } from './XhsFeedBigImage';
 
 interface BigContentCaseEntry {
   caseRoute: string;
@@ -48,6 +56,46 @@ function hemaMatchGridCasePage(pageStack: NavPathStack) {
   HemaMatchGridBigContentPage({ pageStack: pageStack })
 }
 
+@Builder
+function taobaoHomeBannerCasePage(pageStack: NavPathStack) {
+  TaobaoHomeBigBannerPage({ pageStack: pageStack })
+}
+
+@Builder
+function pddHomeContentCasePage(pageStack: NavPathStack) {
+  PddHomeBigContentPage({ pageStack: pageStack })
+}
+
+@Builder
+function douyinProfileAvatarCasePage(pageStack: NavPathStack) {
+  DouyinProfileBigAvatarPage({ pageStack: pageStack })
+}
+
+@Builder
+function jdHomeIconCasePage(pageStack: NavPathStack) {
+  JdHomeBigIconPage({ pageStack: pageStack })
+}
+
+@Builder
+function elemeHomeBannerCasePage(pageStack: NavPathStack) {
+  ElemeHomeBigBannerPage({ pageStack: pageStack })
+}
+
+@Builder
+function weiboHotTextCasePage(pageStack: NavPathStack) {
+  WeiboHotBigTextPage({ pageStack: pageStack })
+}
+
+@Builder
+function ctripHomeBannerCasePage(pageStack: NavPathStack) {
+  CtripHomeBigBannerPage({ pageStack: pageStack })
+}
+
+@Builder
+function xhsFeedImageCasePage(pageStack: NavPathStack) {
+  XhsFeedBigImagePage({ pageStack: pageStack })
+}
+
 /** 「大图大字」分类下的全部案例，新增案例时在这里追加一条 */
 const BIG_CONTENT_CASES: BigContentCaseEntry[] = [
   {
@@ -65,6 +113,70 @@ const BIG_CONTENT_CASES: BigContentCaseEntry[] = [
     caseIcon: '字',
     caseSummary: '双屏态下商品图与字号一起放大 1.45～2 倍',
     casePage: wrapBuilder(hemaMatchGridCasePage)
+  },
+  {
+    caseRoute: 'bigcontent/taobao-home-banner',
+    caseTitle: '淘宝首页banner放大',
+    caseTag: '大图',
+    caseIcon: '淘',
+    caseSummary: '展开态首页banner放大到占满整屏，下方楼层被挤没。',
+    casePage: wrapBuilder(taobaoHomeBannerCasePage)
+  },
+  {
+    caseRoute: 'bigcontent/pdd-home-content',
+    caseTitle: '拼多多首页大字大图',
+    caseTag: '大图',
+    caseIcon: '拼',
+    caseSummary: '展开态百亿补贴大图与标题文字整体放大，一屏只剩一张图。',
+    casePage: wrapBuilder(pddHomeContentCasePage)
+  },
+  {
+    caseRoute: 'bigcontent/douyin-profile-avatar',
+    caseTitle: '抖音个人页头像放大',
+    caseTag: '大图',
+    caseIcon: '抖',
+    caseSummary: '展开态头像与数字被放大数倍，昵称顶出屏幕。',
+    casePage: wrapBuilder(douyinProfileAvatarCasePage)
+  },
+  {
+    caseRoute: 'bigcontent/jd-home-icon',
+    caseTitle: '京东首页金刚区放大',
+    caseTag: '大图',
+    caseIcon: '京',
+    caseSummary: '展开态金刚区图标被放大两倍，一屏放不下一组入口。',
+    casePage: wrapBuilder(jdHomeIconCasePage)
+  },
+  {
+    caseRoute: 'bigcontent/eleme-home-banner',
+    caseTitle: '饿了么首页banner放大',
+    caseTag: '大图',
+    caseIcon: '饿',
+    caseSummary: '展开态蓝色banner与吃货豆弹窗图放大占满首屏。',
+    casePage: wrapBuilder(elemeHomeBannerCasePage)
+  },
+  {
+    caseRoute: 'bigcontent/weibo-hot-text',
+    caseTitle: '微博热搜大字排行',
+    caseTag: '大字',
+    caseIcon: '搜',
+    caseSummary: '展开态热搜词条字号翻倍，一行只能放下几个字。',
+    casePage: wrapBuilder(weiboHotTextCasePage)
+  },
+  {
+    caseRoute: 'bigcontent/ctrip-home-banner',
+    caseTitle: '携程首页卡片放大',
+    caseTag: '大图',
+    caseIcon: '旅',
+    caseSummary: '展开态特价机票大卡放大，一行只放得下一张卡。',
+    casePage: wrapBuilder(ctripHomeBannerCasePage)
+  },
+  {
+    caseRoute: 'bigcontent/xhs-feed-image',
+    caseTitle: '小红书信息流大图',
+    caseTag: '大图',
+    caseIcon: '红',
+    caseSummary: '展开态瀑布流图片放大两倍，一屏只剩两张图。',
+    casePage: wrapBuilder(xhsFeedImageCasePage)
   }
 ];
 

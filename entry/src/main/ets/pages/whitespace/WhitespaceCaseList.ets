@@ -38,6 +38,12 @@ import { QidianMonthRankPage } from './QidianMonthRank';
 import { BookshelfHistoryPage } from './BookshelfHistory';
 import { GalaxyNewsFavoritePage } from './GalaxyNewsFavorite';
 import { WeiboUserCenterMarginsPage } from './WeiboUserCenterMargins';
+import { VipShopHomeBlankPage } from './VipShopHomeBlank';
+import { SamClubDetailBlankPage } from './SamClubDetailBlank';
+import { SuningHomeBlankPage } from './SuningHomeBlank';
+import { MafengwoGuideBlankPage } from './MafengwoGuideBlank';
+import { QunarHotelListBlankPage } from './QunarHotelListBlank';
+import { NetEaseNewsDetailBlankPage } from './NetEaseNewsDetailBlank';
 
 interface WhitespaceCaseEntry {
   caseRoute: string;
@@ -120,6 +126,36 @@ function galaxyNewsCasePage(pageStack: NavPathStack) {
 @Builder
 function weiboStageCasePage(pageStack: NavPathStack) {
   WeiboUserCenterMarginsPage({ pageStack: pageStack })
+}
+
+@Builder
+function vipShopHomeCasePage(pageStack: NavPathStack) {
+  VipShopHomeBlankPage({ pageStack: pageStack })
+}
+
+@Builder
+function samClubDetailCasePage(pageStack: NavPathStack) {
+  SamClubDetailBlankPage({ pageStack: pageStack })
+}
+
+@Builder
+function suningHomeCasePage(pageStack: NavPathStack) {
+  SuningHomeBlankPage({ pageStack: pageStack })
+}
+
+@Builder
+function mafengwoGuideCasePage(pageStack: NavPathStack) {
+  MafengwoGuideBlankPage({ pageStack: pageStack })
+}
+
+@Builder
+function qunarHotelCasePage(pageStack: NavPathStack) {
+  QunarHotelListBlankPage({ pageStack: pageStack })
+}
+
+@Builder
+function neteaseNewsCasePage(pageStack: NavPathStack) {
+  NetEaseNewsDetailBlankPage({ pageStack: pageStack })
 }
 
 /** 「留白过多」分类下的全部案例，新增案例时在这里追加一条 */
@@ -235,6 +271,54 @@ const WHITESPACE_CASES: WhitespaceCaseEntry[] = [
     caseIcon: '边',
     caseSummary: '整页缩在正中一条手机宽度里，左右各空出一大片底灰',
     casePage: wrapBuilder(weiboStageCasePage)
+  },
+  {
+    caseRoute: 'whitespace/vipshop-home',
+    caseTitle: '唯品会首页内容挤左侧',
+    caseTag: '留白',
+    caseIcon: '唯',
+    caseSummary: '横屏时瀑布流只占左半屏，右侧一整块空着',
+    casePage: wrapBuilder(vipShopHomeCasePage)
+  },
+  {
+    caseRoute: 'whitespace/samclub-detail',
+    caseTitle: '山姆商品详情大片留白',
+    caseTag: '留白',
+    caseIcon: '山',
+    caseSummary: '双屏态商品图与信息挤在左侧，右侧到屏幕边缘全空',
+    casePage: wrapBuilder(samClubDetailCasePage)
+  },
+  {
+    caseRoute: 'whitespace/suning-home',
+    caseTitle: '苏宁首页右侧留白',
+    caseTag: '留白',
+    caseIcon: '苏',
+    caseSummary: '首页楼层卡片固定窄宽，横屏右半屏空无一物',
+    casePage: wrapBuilder(suningHomeCasePage)
+  },
+  {
+    caseRoute: 'whitespace/maofengwo-guide',
+    caseTitle: '马蜂窝攻略上下空档',
+    caseTag: '留白',
+    caseIcon: '蜂',
+    caseSummary: '展开态攻略正文与评论区之间空出一大段，版面稀稀拉拉',
+    casePage: wrapBuilder(mafengwoGuideCasePage)
+  },
+  {
+    caseRoute: 'whitespace/qunar-hotel-list',
+    caseTitle: '去哪儿酒店列表挤一侧',
+    caseTag: '留白',
+    caseIcon: '店',
+    caseSummary: '横屏时酒店卡片只占左侧一列，右半屏全是空白',
+    casePage: wrapBuilder(qunarHotelCasePage)
+  },
+  {
+    caseRoute: 'whitespace/netease-news-detail',
+    caseTitle: '网易新闻正文两侧空档',
+    caseTag: '留白',
+    caseIcon: '闻',
+    caseSummary: '双屏态正文窄窄一条贴左边，右边大片空白像没加载完',
+    casePage: wrapBuilder(neteaseNewsCasePage)
   }
 ];
 

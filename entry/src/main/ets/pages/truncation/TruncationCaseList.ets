@@ -38,6 +38,20 @@ import { StationBoardOverflowPage } from './StationBoardOverflow';
 import { DisneyTicketDateOverflowPage } from './DisneyTicketDateOverflow';
 import { DidiDeliveryHeaderOverflowPage } from './DidiDeliveryHeaderOverflow';
 import { DidiOrderListOverflowPage } from './DidiOrderListOverflow';
+import { TaobaoOrderDetailOverflowPage } from './TaobaoOrderDetailOverflow';
+import { JdCouponDialogTruncationPage } from './JdCouponDialogTruncation';
+import { TrainTicketPassengerSheetPage } from './TrainTicketPassengerSheet';
+import { CtripFlightFilterOverlapPage } from './CtripFlightFilterOverlap';
+import { ElemeShopNoticeOverlapPage } from './ElemeShopNoticeOverlap';
+import { AlipayBillListOverflowPage } from './AlipayBillListOverflow';
+import { DouyinCommentSheetFoldPage } from './DouyinCommentSheetFold';
+import { PddGroupDialogTruncationPage } from './PddGroupDialogTruncation';
+import { XhsNoteTagWrapPage } from './XhsNoteTagWrap';
+import { NetEasePlaylistOverlapPage } from './NetEasePlaylistOverlap';
+import { QqMusicLyricTruncationPage } from './QqMusicLyricTruncation';
+import { AmapRouteSheetTruncationPage } from './AmapRouteSheetTruncation';
+import { IqiyiVipDialogTruncationPage } from './IqiyiVipDialogTruncation';
+import { WechatTransferNoteOverflowPage } from './WechatTransferNoteOverflow';
 
 interface TruncationCaseEntry {
   caseRoute: string;
@@ -131,6 +145,76 @@ function didiDeliveryCasePage(pageStack: NavPathStack) {
 @Builder
 function didiOrderListCasePage(pageStack: NavPathStack) {
   DidiOrderListOverflowPage({ pageStack: pageStack })
+}
+
+@Builder
+function taobaoOrderDetailCasePage(pageStack: NavPathStack) {
+  TaobaoOrderDetailOverflowPage({ pageStack: pageStack })
+}
+
+@Builder
+function jdCouponDialogCasePage(pageStack: NavPathStack) {
+  JdCouponDialogTruncationPage({ pageStack: pageStack })
+}
+
+@Builder
+function trainPassengerSheetCasePage(pageStack: NavPathStack) {
+  TrainTicketPassengerSheetPage({ pageStack: pageStack })
+}
+
+@Builder
+function ctripFlightFilterCasePage(pageStack: NavPathStack) {
+  CtripFlightFilterOverlapPage({ pageStack: pageStack })
+}
+
+@Builder
+function elemeShopNoticeCasePage(pageStack: NavPathStack) {
+  ElemeShopNoticeOverlapPage({ pageStack: pageStack })
+}
+
+@Builder
+function alipayBillListCasePage(pageStack: NavPathStack) {
+  AlipayBillListOverflowPage({ pageStack: pageStack })
+}
+
+@Builder
+function douyinCommentSheetCasePage(pageStack: NavPathStack) {
+  DouyinCommentSheetFoldPage({ pageStack: pageStack })
+}
+
+@Builder
+function pddGroupDialogCasePage(pageStack: NavPathStack) {
+  PddGroupDialogTruncationPage({ pageStack: pageStack })
+}
+
+@Builder
+function xhsNoteTagCasePage(pageStack: NavPathStack) {
+  XhsNoteTagWrapPage({ pageStack: pageStack })
+}
+
+@Builder
+function neteasePlaylistCasePage(pageStack: NavPathStack) {
+  NetEasePlaylistOverlapPage({ pageStack: pageStack })
+}
+
+@Builder
+function qqMusicLyricCasePage(pageStack: NavPathStack) {
+  QqMusicLyricTruncationPage({ pageStack: pageStack })
+}
+
+@Builder
+function amapRouteSheetCasePage(pageStack: NavPathStack) {
+  AmapRouteSheetTruncationPage({ pageStack: pageStack })
+}
+
+@Builder
+function iqiyiVipDialogCasePage(pageStack: NavPathStack) {
+  IqiyiVipDialogTruncationPage({ pageStack: pageStack })
+}
+
+@Builder
+function wechatTransferNoteCasePage(pageStack: NavPathStack) {
+  WechatTransferNoteOverflowPage({ pageStack: pageStack })
 }
 
 /** 截断重叠分类下的全部案例，新增案例时在这里追加一条 */
@@ -262,6 +346,118 @@ const TRUNCATION_CASES: TruncationCaseEntry[] = [
     caseIcon: '单',
     caseSummary: '订单地址冲出卡片，被屏幕右边缘切断',
     casePage: wrapBuilder(didiOrderListCasePage)
+  },
+  {
+    caseRoute: 'truncation/taobao-order-detail',
+    caseTitle: '淘宝订单详情地址溢出',
+    caseTag: '文字溢出',
+    caseIcon: '淘',
+    caseSummary: '订单收货地址长文本冲出白卡，被屏幕右边缘切掉半个字。',
+    casePage: wrapBuilder(taobaoOrderDetailCasePage)
+  },
+  {
+    caseRoute: 'truncation/jd-coupon-dialog',
+    caseTitle: '京东用券规则弹窗截断',
+    caseTag: '弹窗截断',
+    caseIcon: '券',
+    caseSummary: '用券规则弹窗最后一行规则与「知道了」按钮被弹窗下沿裁掉。',
+    casePage: wrapBuilder(jdCouponDialogCasePage)
+  },
+  {
+    caseRoute: 'truncation/train-passenger-sheet',
+    caseTitle: '12306乘车人弹层截断',
+    caseTag: '弹窗截断',
+    caseIcon: '车',
+    caseSummary: '乘车人列表最后一行与「完成」按钮被弹层下沿裁掉。',
+    casePage: wrapBuilder(trainPassengerSheetCasePage)
+  },
+  {
+    caseRoute: 'truncation/ctrip-flight-filter',
+    caseTitle: '携程机票筛选项压行',
+    caseTag: '文字重叠',
+    caseIcon: '航',
+    caseSummary: '筛选标签行与「经济舱1.8折」起价行互相压盖。',
+    casePage: wrapBuilder(ctripFlightFilterCasePage)
+  },
+  {
+    caseRoute: 'truncation/eleme-shop-notice',
+    caseTitle: '饿了么店铺公告压字',
+    caseTag: '文字重叠',
+    caseIcon: '饿',
+    caseSummary: '店铺公告长文与「30分钟达」配送信息叠在一起。',
+    casePage: wrapBuilder(elemeShopNoticeCasePage)
+  },
+  {
+    caseRoute: 'truncation/alipay-bill-list',
+    caseTitle: '支付宝账单商户名溢出',
+    caseTag: '文字溢出',
+    caseIcon: '账',
+    caseSummary: '商户名与金额同一行冲出卡片，右侧金额被屏幕切断。',
+    casePage: wrapBuilder(alipayBillListCasePage)
+  },
+  {
+    caseRoute: 'truncation/douyin-comment-sheet',
+    caseTitle: '抖音评论弹层文字折行',
+    caseTag: '文字折行',
+    caseIcon: '评',
+    caseSummary: '评论长句逐字折行、@用户名被拆成两行错位。',
+    casePage: wrapBuilder(douyinCommentSheetCasePage)
+  },
+  {
+    caseRoute: 'truncation/pdd-group-dialog',
+    caseTitle: '拼多多拼单结果弹窗截断',
+    caseTag: '弹窗截断',
+    caseIcon: '拼',
+    caseSummary: '拼单弹窗的倒计时行与「邀请好友参团」按钮被下沿裁掉。',
+    casePage: wrapBuilder(pddGroupDialogCasePage)
+  },
+  {
+    caseRoute: 'truncation/xhs-note-tags',
+    caseTitle: '小红书笔记标签竖排',
+    caseTag: '文字折行',
+    caseIcon: '红',
+    caseSummary: '「户外露营好物推荐」等标签逐字竖排，两列标签错位重叠。',
+    casePage: wrapBuilder(xhsNoteTagCasePage)
+  },
+  {
+    caseRoute: 'truncation/netease-playlist',
+    caseTitle: '网易云歌单曲名压歌手',
+    caseTag: '文字重叠',
+    caseIcon: '云',
+    caseSummary: '歌单里长歌名与歌手名同一列互相压盖。',
+    casePage: wrapBuilder(neteasePlaylistCasePage)
+  },
+  {
+    caseRoute: 'truncation/qqmusic-lyric',
+    caseTitle: 'QQ音乐歌词行被裁',
+    caseTag: '文字截断',
+    caseIcon: '词',
+    caseSummary: '歌词长句被右侧封面图盖住，句尾丢失。',
+    casePage: wrapBuilder(qqMusicLyricCasePage)
+  },
+  {
+    caseRoute: 'truncation/amap-route-sheet',
+    caseTitle: '高德路线方案弹层截断',
+    caseTag: '弹窗截断',
+    caseIcon: '图',
+    caseSummary: '推荐方案的红绿灯与打车价被弹层下沿裁掉一行。',
+    casePage: wrapBuilder(amapRouteSheetCasePage)
+  },
+  {
+    caseRoute: 'truncation/iqiyi-vip-dialog',
+    caseTitle: '爱奇艺会员弹窗权益截断',
+    caseTag: '弹窗截断',
+    caseIcon: '视',
+    caseSummary: '会员权益第5条与「立即开通」按钮被弹窗裁掉。',
+    casePage: wrapBuilder(iqiyiVipDialogCasePage)
+  },
+  {
+    caseRoute: 'truncation/wechat-transfer-note',
+    caseTitle: '微信转账留言溢出',
+    caseTag: '文字溢出',
+    caseIcon: '转',
+    caseSummary: '转账留言与金额冲出气泡，被屏幕右边缘切断。',
+    casePage: wrapBuilder(wechatTransferNoteCasePage)
   }
 ];
 
