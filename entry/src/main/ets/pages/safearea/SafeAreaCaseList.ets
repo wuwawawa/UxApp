@@ -26,6 +26,7 @@ import { FlightFilterStatusBarPage } from './FlightFilterStatusBar';
 import { MailAddressStatusBarPage } from './MailAddressStatusBar';
 import { ProfileHeaderStatusBarPage } from './ProfilePhoneStatusBar';
 import { TaobaoOrderDetailNotchPage } from './TaobaoOrderDetailNotch';
+import { BankTransferNavBarPage } from './BankTransferNavBar';
 
 interface SafeAreaCaseEntry {
   caseRoute: string;
@@ -61,6 +62,11 @@ function taobaoOrderDetailCasePage(pageStack: NavPathStack) {
   TaobaoOrderDetailNotchPage({ pageStack: pageStack })
 }
 
+@Builder
+function bankTransferCasePage(pageStack: NavPathStack) {
+  BankTransferNavBarPage({ pageStack: pageStack })
+}
+
 /** 「未避让安全区」分类下的全部案例，新增案例时在这里追加一条 */
 const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
   {
@@ -94,6 +100,14 @@ const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
     caseIcon: '淘',
     caseSummary: '折叠态顶部「订单详情」标题正对前置摄像头挖孔，标题文字被黑色圆孔从正中穿过',
     casePage: wrapBuilder(taobaoOrderDetailCasePage)
+  },
+  {
+    caseRoute: 'safearea/bank-transfer-navbar',
+    caseTitle: '银行转账按钮压导航条',
+    caseTag: '导航条',
+    caseIcon: '银',
+    caseSummary: '底部「确认转账」沉到导航条下方，一半按钮被小白条挡住',
+    casePage: wrapBuilder(bankTransferCasePage)
   }
 ];
 
