@@ -27,6 +27,7 @@ import { MailAddressStatusBarPage } from './MailAddressStatusBar';
 import { ProfileHeaderStatusBarPage } from './ProfilePhoneStatusBar';
 import { TaobaoOrderDetailNotchPage } from './TaobaoOrderDetailNotch';
 import { BankTransferNavBarPage } from './BankTransferNavBar';
+import { GameStartNavBarPage } from './GameStartNavBar';
 
 interface SafeAreaCaseEntry {
   caseRoute: string;
@@ -65,6 +66,11 @@ function taobaoOrderDetailCasePage(pageStack: NavPathStack) {
 @Builder
 function bankTransferCasePage(pageStack: NavPathStack) {
   BankTransferNavBarPage({ pageStack: pageStack })
+}
+
+@Builder
+function gameStartCasePage(pageStack: NavPathStack) {
+  GameStartNavBarPage({ pageStack: pageStack })
 }
 
 /** 「未避让安全区」分类下的全部案例，新增案例时在这里追加一条 */
@@ -108,6 +114,14 @@ const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
     caseIcon: '银',
     caseSummary: '底部「确认转账」沉到导航条下方，一半按钮被小白条挡住',
     casePage: wrapBuilder(bankTransferCasePage)
+  },
+  {
+    caseRoute: 'safearea/game-start-navbar',
+    caseTitle: '游戏登录开始键压导航条',
+    caseTag: '导航条',
+    caseIcon: '游',
+    caseSummary: '开始游戏按钮贴着屏幕底边，被导航条小白条盖住一半',
+    casePage: wrapBuilder(gameStartCasePage)
   }
 ];
 
