@@ -5,7 +5,7 @@
 **不允许留下任何能直接得到答案的东西**（见下一节「铁律」）。
 
 - 应用包名：`com.example.helloworld`（入口 Ability：`EntryAbility`，首页 `pages/Index`）
-- 当前内容：4 个问题分类 —— 「截断重叠」16 个案例、「未避让安全区」3 个案例、
+- 当前内容：4 个问题分类 —— 「截断重叠」16 个案例、「未避让安全区」4 个案例、
   「留白过多」14 个案例、「大图大字」2 个案例
 - 验证方式：以常驻模拟器为主，设备名 / 序列号每次用 `devecocli device list` 现查，
   命令里显式指定 `--device` / `--target`（详见第三节）
@@ -76,6 +76,7 @@ UxApp/
 │       │       │   └── DidiOrderListOverflow.ets    # 滴滴我的订单地址溢出
 │       │       ├── safearea/                  # 分类 02「未避让安全区」
 │       │       │   ├── SafeAreaCaseList.ets        # 分类页：案例表 + 搜索/标签筛选 + 页面注册
+│       │       │   ├── TaobaoOrderDetailNotch.ets  # 淘宝订单详情标题压挖孔
 │       │       │   ├── FlightFilterStatusBar.ets   # 机票筛选面板压状态栏
 │       │       │   ├── MailAddressStatusBar.ets    # 邮寄地址页拉起键盘压状态栏
 │       │       │   └── ProfilePhoneStatusBar.ets   # 我的页手机号压状态栏
@@ -135,6 +136,32 @@ UxApp/
 
 > 该设备的 `fold` 只接受 `open | half-open | close`（没有 `vertical-open`）；
 > 竖屏 / 横屏是**旋转**决定的，不是折叠状态决定的。
+
+### 挖孔（前置摄像头）位置实测 —— Pura X Max
+
+同一颗物理挖孔圆，随屏态 / 旋转出现在不同位置（矩形单位 px，坐标系随屏幕当前方向）：
+
+| 屏态 | 分辨率 (px) | 挖孔矩形 [X,Y,W,H] | 位置换算（vp，密度 2.75） |
+|---|---|---|---|
+| 单屏态（外屏） | 1264×1848 | `[599, 26, 66, 66]` | 顶部正中，24vp 圆：x 218~242，y 9.5~33.5 |
+| 双屏态竖屏 | 1828×2584 | `[1728, 2470, 72, 72]` | 右下角，26.2vp 圆：距右 10.2vp、距底 15.3vp |
+| 双屏态横屏 | 2584×1828 | `[2470, 28, 72, 72]` | 右上角，26.2vp 圆：距右 15.3vp、距顶 10.2vp |
+
+- 瀑布屏四边（`WaterFall_L/T/R/B`）全为 0，本机无曲面参数。
+- 展开态折痕：横屏是竖向中缝 `LiveCreaseRects [1194, 0, 196, 1828]`（196px 宽）；
+  竖屏是横向中缝 `[0, 1194, 1828, 196]`。
+- 挖孔数据挂在 **DisplayManagerService** 下（`WindowManagerService` 里没有），现查命令：
+
+```powershell
+hdc -t <serial> shell "hidumper -s DisplayManagerService -a '-a'"
+# 输出里找 [CUTOUT INFO] 段：
+#   BoundingRects<X,Y,W,H>      挖孔矩形（px，随当前旋转方向）
+#   WaterFall_L/T/R/B<X,Y,W,H>  四边曲面区域
+# 同段落的 PhysicalFoldStatus / Bounds<L,T,W,H> 标明当前屏态与分辨率
+```
+
+- 应用内等价 API：`display.getCutoutInfo()`（`@ohos.display`，取 `boundingRects`）或
+  `window.getWindowAvoidArea(WindowAvoidAreaType.TYPE_CUTOUT)`。
 
 ### 选设备
 
@@ -250,7 +277,7 @@ devecocli emulator list                                                        #
 devecocli emulator start "<name>"                                              # 没设备时自己拉起，再轮询 device list
 devecocli device view -t "<dev>"                                               # 设备详情
 hdc -t <serial> shell hidumper -s RenderService -a screen                      # 当前渲染分辨率
-hdc -t <serial> shell "hidumper -s DisplayManagerService -a '-a'"              # Density / DPI
+hdc -t <serial> shell "hidumper -s DisplayManagerService -a '-a'"              # Density / DPI / 挖孔位置（[CUTOUT INFO]，详见第三节）
 ```
 
 ---
