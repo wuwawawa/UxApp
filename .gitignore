@@ -13,3 +13,4 @@
 **/.test
 /.appanalyzer
 /.cache
+build-profile.json5
