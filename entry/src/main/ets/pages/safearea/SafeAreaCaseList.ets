@@ -26,6 +26,10 @@ import { FlightFilterStatusBarPage } from './FlightFilterStatusBar';
 import { MailAddressStatusBarPage } from './MailAddressStatusBar';
 import { ProfileHeaderStatusBarPage } from './ProfilePhoneStatusBar';
 import { TaobaoOrderDetailNotchPage } from './TaobaoOrderDetailNotch';
+import { BiliVideoDanmakuNotchPage } from './BiliVideoDanmakuNotch';
+import { JdProductBuyNotchPage } from './JdProductBuyNotch';
+import { WeiboHomeComposeNotchPage } from './WeiboHomeComposeNotch';
+import { ElemeStoreMoreNotchPage } from './ElemeStoreMoreNotch';
 import { BankTransferNavBarPage } from './BankTransferNavBar';
 import { GameStartNavBarPage } from './GameStartNavBar';
 
@@ -61,6 +65,26 @@ function mailAddressCasePage(pageStack: NavPathStack) {
 @Builder
 function taobaoOrderDetailCasePage(pageStack: NavPathStack) {
   TaobaoOrderDetailNotchPage({ pageStack: pageStack })
+}
+
+@Builder
+function biliVideoDanmakuCasePage(pageStack: NavPathStack) {
+  BiliVideoDanmakuNotchPage({ pageStack: pageStack })
+}
+
+@Builder
+function jdProductBuyCasePage(pageStack: NavPathStack) {
+  JdProductBuyNotchPage({ pageStack: pageStack })
+}
+
+@Builder
+function weiboHomeComposeCasePage(pageStack: NavPathStack) {
+  WeiboHomeComposeNotchPage({ pageStack: pageStack })
+}
+
+@Builder
+function elemeStoreMoreCasePage(pageStack: NavPathStack) {
+  ElemeStoreMoreNotchPage({ pageStack: pageStack })
 }
 
 @Builder
@@ -106,6 +130,38 @@ const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
     caseIcon: '淘',
     caseSummary: '折叠态顶部「订单详情」标题正对前置摄像头挖孔，标题文字被黑色圆孔从正中穿过',
     casePage: wrapBuilder(taobaoOrderDetailCasePage)
+  },
+  {
+    caseRoute: 'safearea/bili-video-danmaku',
+    caseTitle: 'B站视频弹幕条压挖孔',
+    caseTag: '挖孔',
+    caseIcon: 'B',
+    caseSummary: '折叠态顶部弹幕输入条被挖孔从中间削掉一截，「发个弹幕见证当下」占位文字被黑孔盖住',
+    casePage: wrapBuilder(biliVideoDanmakuCasePage)
+  },
+  {
+    caseRoute: 'safearea/jd-product-buy',
+    caseTitle: '京东商品购买键压挖孔',
+    caseTag: '挖孔',
+    caseIcon: '京',
+    caseSummary: '双屏竖屏展开态右下角「立即购买」按钮右端被挖孔整块穿透，末字被黑孔吃掉一角',
+    casePage: wrapBuilder(jdProductBuyCasePage)
+  },
+  {
+    caseRoute: 'safearea/weibo-home-compose',
+    caseTitle: '微博发布按钮压挖孔',
+    caseTag: '挖孔',
+    caseIcon: '微',
+    caseSummary: '双屏横屏展开态右上角橙色「发布」按钮被挖孔从中部穿透，白色加号被黑孔盖住一半',
+    casePage: wrapBuilder(weiboHomeComposeCasePage)
+  },
+  {
+    caseRoute: 'safearea/eleme-store-more',
+    caseTitle: '饿了么店铺更多按钮压挖孔',
+    caseTag: '挖孔',
+    caseIcon: '饿',
+    caseSummary: '双屏横屏展开态右上角「更多」圆钮被挖孔穿透，白色点阵被黑孔盖住两排',
+    casePage: wrapBuilder(elemeStoreMoreCasePage)
   },
   {
     caseRoute: 'safearea/bank-transfer-navbar',
