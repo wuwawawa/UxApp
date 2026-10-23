@@ -28,6 +28,13 @@ import { ProfileHeaderStatusBarPage } from './ProfilePhoneStatusBar';
 import { TaobaoOrderDetailNotchPage } from './TaobaoOrderDetailNotch';
 import { WeiboHomeComposeNotchPage } from './WeiboHomeComposeNotch';
 import { ElemeStoreMoreNotchPage } from './ElemeStoreMoreNotch';
+import { DidiRideTabsNotchPage } from './DidiRideTabsNotch';
+import { QqMusicLyricNotchPage } from './QqMusicLyricNotch';
+import { CalendarMonthNotchPage } from './CalendarMonthNotch';
+import { WechatMomentCameraNotchPage } from './WechatMomentCameraNotch';
+import { MeituanOrderServiceNotchPage } from './MeituanOrderServiceNotch';
+import { JdOrderConfirmNotchPage } from './JdOrderConfirmNotch';
+import { CtripFloatServiceNotchPage } from './CtripFloatServiceNotch';
 import { BankTransferNavBarPage } from './BankTransferNavBar';
 import { GameStartNavBarPage } from './GameStartNavBar';
 
@@ -73,6 +80,41 @@ function weiboHomeComposeCasePage(pageStack: NavPathStack) {
 @Builder
 function elemeStoreMoreCasePage(pageStack: NavPathStack) {
   ElemeStoreMoreNotchPage({ pageStack: pageStack })
+}
+
+@Builder
+function didiRideTabsCasePage(pageStack: NavPathStack) {
+  DidiRideTabsNotchPage({ pageStack: pageStack })
+}
+
+@Builder
+function qqMusicLyricCasePage(pageStack: NavPathStack) {
+  QqMusicLyricNotchPage({ pageStack: pageStack })
+}
+
+@Builder
+function calendarMonthCasePage(pageStack: NavPathStack) {
+  CalendarMonthNotchPage({ pageStack: pageStack })
+}
+
+@Builder
+function wechatMomentCameraCasePage(pageStack: NavPathStack) {
+  WechatMomentCameraNotchPage({ pageStack: pageStack })
+}
+
+@Builder
+function meituanOrderServiceCasePage(pageStack: NavPathStack) {
+  MeituanOrderServiceNotchPage({ pageStack: pageStack })
+}
+
+@Builder
+function jdOrderConfirmCasePage(pageStack: NavPathStack) {
+  JdOrderConfirmNotchPage({ pageStack: pageStack })
+}
+
+@Builder
+function ctripFloatServiceCasePage(pageStack: NavPathStack) {
+  CtripFloatServiceNotchPage({ pageStack: pageStack })
 }
 
 @Builder
@@ -134,6 +176,62 @@ const SAFE_AREA_CASES: SafeAreaCaseEntry[] = [
     caseIcon: '饿',
     caseSummary: '双屏横屏展开态右上角「更多」圆钮被挖孔穿透，白色点阵被黑孔盖住两排',
     casePage: wrapBuilder(elemeStoreMoreCasePage)
+  },
+  {
+    caseRoute: 'safearea/didi-ride-tabs',
+    caseTitle: '滴滴打车车型切换压挖孔',
+    caseTags: ['挖孔'],
+    caseIcon: '滴',
+    caseSummary: '折叠态顶部居中的「快车」左字被挖孔整块盖住，选中下划线也被圆孔切断',
+    casePage: wrapBuilder(didiRideTabsCasePage)
+  },
+  {
+    caseRoute: 'safearea/qqmusic-lyric',
+    caseTitle: 'QQ音乐歌名压挖孔',
+    caseTags: ['挖孔'],
+    caseIcon: '音',
+    caseSummary: '折叠态歌词页顶栏正中的歌名中间一字被挖孔吃掉，两侧也各缺一角',
+    casePage: wrapBuilder(qqMusicLyricCasePage)
+  },
+  {
+    caseRoute: 'safearea/calendar-month',
+    caseTitle: '日历月份压挖孔',
+    caseTags: ['挖孔'],
+    caseIcon: '历',
+    caseSummary: '折叠态月视图顶栏「2026年10月」的「年」与半个「1」被挖孔盖住',
+    casePage: wrapBuilder(calendarMonthCasePage)
+  },
+  {
+    caseRoute: 'safearea/wechat-moment-camera',
+    caseTitle: '朋友圈相机按钮压挖孔',
+    caseTags: ['挖孔', '状态栏'],
+    caseIcon: '朋',
+    caseSummary: '双屏横屏右上角相机图标被挖孔压成左侧一条残边，状态栏图标也叠在同一行',
+    casePage: wrapBuilder(wechatMomentCameraCasePage)
+  },
+  {
+    caseRoute: 'safearea/meituan-order-service',
+    caseTitle: '美团外卖客服按钮压挖孔',
+    caseTags: ['挖孔', '状态栏'],
+    caseIcon: '美',
+    caseSummary: '双屏横屏右上角「客服」胶囊的「服」字与右侧描边被挖孔整块盖住',
+    casePage: wrapBuilder(meituanOrderServiceCasePage)
+  },
+  {
+    caseRoute: 'safearea/jd-order-confirm',
+    caseTitle: '京东确认订单标题压挖孔',
+    caseTags: ['挖孔', '状态栏'],
+    caseIcon: '京',
+    caseSummary: '折叠态顶部居中的「确认订单」被挖孔从正中穿过，中间两字只剩两侧半截',
+    casePage: wrapBuilder(jdOrderConfirmCasePage)
+  },
+  {
+    caseRoute: 'safearea/ctrip-float-service',
+    caseTitle: '携程我的订单标题压挖孔',
+    caseTags: ['挖孔', '状态栏'],
+    caseIcon: '携',
+    caseSummary: '折叠态顶部居中的「我的订单」被挖孔整块盖住「的订」，只剩两侧残边',
+    casePage: wrapBuilder(ctripFloatServiceCasePage)
   },
   {
     caseRoute: 'safearea/bank-transfer-navbar',
