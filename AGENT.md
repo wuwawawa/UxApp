@@ -5,7 +5,7 @@
 **不允许留下任何能直接得到答案的东西**（见下一节「铁律」）。
 
 - 应用包名：`com.example.helloworld`（入口 Ability：`EntryAbility`，首页 `pages/Index`）
-- 当前内容：4 个问题分类 —— 「截断重叠」16 个案例、「未避让安全区」8 个案例、
+- 当前内容：4 个问题分类 —— 「截断重叠」16 个案例、「未避让安全区」15 个案例、
   「留白过多」14 个案例、「大图大字」10 个案例
 - 验证方式：以常驻模拟器为主，设备名 / 序列号每次用 `devecocli device list` 现查，
   命令里显式指定 `--device` / `--target`（详见第三节）
@@ -79,6 +79,13 @@ UxApp/
 │       │       │   ├── TaobaoOrderDetailNotch.ets  # 淘宝订单详情标题压挖孔（单屏态·顶部正中）
 │       │       │   ├── WeiboHomeComposeNotch.ets   # 微博发布按钮压挖孔（双屏横屏·右上角，兼压状态栏）
 │       │       │   ├── ElemeStoreMoreNotch.ets     # 饿了么店铺更多按钮压挖孔（双屏横屏·右上角，兼压状态栏）
+│       │       │   ├── DidiRideTabsNotch.ets       # 滴滴车型切换压挖孔（单屏态·顶部正中）
+│       │       │   ├── QqMusicLyricNotch.ets       # QQ音乐歌词页歌名压挖孔（单屏态·顶部正中）
+│       │       │   ├── CalendarMonthNotch.ets      # 日历月视图月份压挖孔（单屏态·顶部正中）
+│       │       │   ├── WechatMomentCameraNotch.ets # 朋友圈相机按钮压挖孔（双屏横屏·右上角，兼压状态栏）
+│       │       │   ├── MeituanOrderServiceNotch.ets # 美团外卖客服按钮压挖孔（双屏横屏·右上角，兼压状态栏）
+│       │       │   ├── JdOrderConfirmNotch.ets     # 京东确认订单标题压挖孔（单屏态·顶部正中）
+│       │       │   ├── CtripFloatServiceNotch.ets  # 携程我的订单标题压挖孔（单屏态·顶部正中）
 │       │       │   ├── BankTransferNavBar.ets      # 银行转账按钮压导航条
 │       │       │   ├── GameStartNavBar.ets         # 游戏登录开始键压导航条
 │       │       │   ├── FlightFilterStatusBar.ets   # 机票筛选面板压状态栏
